@@ -29,8 +29,8 @@ async function start() {
   // API routes
   const { clientesRoutes } = await import('./routes/clientes.routes.js');
   await fastify.register(clientesRoutes, { prefix: '/api' });
-  // await fastify.register(projetosRoutes, { prefix: '/api' });
-  // etc.
+  const { projetosRoutes } = await import('./routes/projetos.routes.js');
+  await fastify.register(projetosRoutes, { prefix: '/api' });
 
   // In production, serve the frontend build as static files
   if (process.env.NODE_ENV === 'production') {

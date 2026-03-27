@@ -4,6 +4,8 @@ import { LoginForm } from '@/features/auth/components/LoginForm';
 import { ProtectedRoute } from '@/features/auth/components/ProtectedRoute';
 import { ClientesListPage } from '@/features/clientes/components/ClientesListPage';
 import { ClienteDetailPage } from '@/features/clientes/components/ClienteDetailPage';
+import { ProjetosListPage } from '@/features/projetos/components/ProjetosListPage';
+import { ProjetoDetailPage } from '@/features/projetos/components/ProjetoDetailPage';
 
 // Placeholder pages for modules not yet implemented
 function PlaceholderPage({ title }: { title: string }) {
@@ -67,7 +69,7 @@ export function Router() {
             path="/projetos"
             element={
               <ProtectedRoute modulo="projetos">
-                <PlaceholderPage title="Projetos" />
+                <ProjetosListPage />
               </ProtectedRoute>
             }
           />
@@ -75,7 +77,7 @@ export function Router() {
             path="/projetos/:id"
             element={
               <ProtectedRoute modulo="projetos">
-                <PlaceholderPage title="Detalhes do Projeto" />
+                <ProjetoDetailPage />
               </ProtectedRoute>
             }
           />
