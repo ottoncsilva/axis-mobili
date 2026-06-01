@@ -197,7 +197,7 @@ export function ProjetosListPage() {
                       {projeto.valorCalculado ? formatMoeda(projeto.valorCalculado) : '—'}
                     </td>
                     <td className="px-4 py-3">
-                      <StatusBadge status={projeto.statusFaturamento === 'em_andamento' ? 'ativo' : projeto.statusFaturamento === 'faturado' ? 'concluido' : 'pendente'} label={STATUS_FAT_LABELS[projeto.statusFaturamento]} />
+                      <StatusBadge status={projeto.statusFaturamento} />
                     </td>
                     <td className="px-4 py-3 text-right">
                       <div className="flex items-center justify-end gap-1" onClick={(e) => e.stopPropagation()}>

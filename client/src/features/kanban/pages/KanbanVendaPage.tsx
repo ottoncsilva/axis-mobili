@@ -120,7 +120,7 @@ export function KanbanVendaPage() {
         etapas={etapas}
         projetos={projetos || []}
         onMoveProject={(projetoId, novaEtapa) =>
-          moveProject.mutateAsync({ projetoId, novaEtapa })
+          moveProject.mutateAsync({ projetoId, novaEtapa }).then(() => undefined)
         }
         onProjetoSelect={handleProjetoSelect}
         isLoading={projetosLoading || moveProject.isPending}

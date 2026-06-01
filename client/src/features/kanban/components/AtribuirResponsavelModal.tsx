@@ -101,7 +101,6 @@ export function AtribuirResponsavelModal({
               <Button
                 onClick={handleAtribuir}
                 disabled={!selectedUsuario || isLoading}
-                loading={isLoading}
               >
                 Atribuir
               </Button>

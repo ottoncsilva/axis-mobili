@@ -78,7 +78,7 @@ export function ProjetoDetailPage() {
   }
 
   const etapasTipo = getEtapasParaTipo(projeto.tipoServico);
-  const etapaAtualIndex = etapasTipo.indexOf(projeto.etapaAtual);
+  const etapaAtualIndex = etapasTipo.indexOf(projeto.etapaAtual as 'concluido');
 
   const tabs = [
     { id: 'info', label: 'Informações', icon: FolderOpen },
