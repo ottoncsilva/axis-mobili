@@ -1,5 +1,5 @@
 import { Navigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../hooks/useAuth';
+import { useAuthContext } from '../context/AuthContext';
 import { usePermissions } from '@/hooks/usePermissions';
 import type { ReactNode } from 'react';
 import { Loader2, ShieldAlert } from 'lucide-react';
@@ -11,11 +11,11 @@ interface ProtectedRouteProps {
 }
 
 export function ProtectedRoute({ children, modulo, acao = 'visualizar' }: ProtectedRouteProps) {
-  const { isAuthenticated, loading } = useAuth();
+  const { autenticado, carregando } = useAuthContext();
   const { canAccess, loading: permLoading } = usePermissions();
   const location = useLocation();
 
-  if (loading || permLoading) {
+  if (carregando || permLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-4">
@@ -29,7 +29,7 @@ export function ProtectedRoute({ children, modulo, acao = 'visualizar' }: Protec
     );
   }
 
-  if (!isAuthenticated) {
+  if (!autenticado) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 

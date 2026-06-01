@@ -1,10 +1,11 @@
 import type { FastifyRequest, FastifyReply } from 'fastify';
-import { adminAuth, adminDb } from '../config/firebase-admin.js';
+import authService from '../services/auth.service.js';
+import { db } from '../config/firebase.js';
 
 export interface AuthenticatedRequest extends FastifyRequest {
   userId?: string;
   userPerfil?: string;
-  userName?: string;
+  userEmail?: string;
 }
 
 export async function authMiddleware(
@@ -23,11 +24,10 @@ export async function authMiddleware(
   const token = authHeader.split('Bearer ')[1];
 
   try {
-    const decodedToken = await adminAuth.verifyIdToken(token);
-    const uid = decodedToken.uid;
+    const decoded = authService.verifyToken(token);
 
-    // Fetch user data from Firestore
-    const userDoc = await adminDb.collection('usuarios').doc(uid).get();
+    // Verify user still exists and is active
+    const userDoc = await db.collection('usuarios').doc(decoded.userId).get();
     if (!userDoc.exists) {
       return reply.status(401).send({
         error: 'Não autorizado',
@@ -35,7 +35,7 @@ export async function authMiddleware(
       });
     }
 
-    const userData = userDoc.data()!;
+    const userData = userDoc.data() as any;
     if (!userData.ativo) {
       return reply.status(403).send({
         error: 'Acesso negado',
@@ -44,9 +44,9 @@ export async function authMiddleware(
     }
 
     // Inject user data into request
-    (request as AuthenticatedRequest).userId = uid;
-    (request as AuthenticatedRequest).userPerfil = userData.perfil;
-    (request as AuthenticatedRequest).userName = userData.nome;
+    (request as AuthenticatedRequest).userId = decoded.userId;
+    (request as AuthenticatedRequest).userPerfil = decoded.perfil;
+    (request as AuthenticatedRequest).userEmail = decoded.email;
   } catch (error) {
     return reply.status(401).send({
       error: 'Não autorizado',

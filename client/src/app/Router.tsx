@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { MainLayout } from '@/components/layout/MainLayout';
-import { LoginForm } from '@/features/auth/components/LoginForm';
+import { LoginPage } from '@/features/auth/pages/LoginPage';
+import { AlterarSenhaPage } from '@/features/auth/pages/AlterarSenhaPage';
 import { ProtectedRoute } from '@/features/auth/components/ProtectedRoute';
 
 // Clientes
@@ -42,8 +43,8 @@ export function Router() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Public route */}
-        <Route path="/login" element={<LoginForm />} />
+        {/* Public routes */}
+        <Route path="/login" element={<LoginPage />} />
 
         {/* Protected routes */}
         <Route
@@ -60,6 +61,14 @@ export function Router() {
             element={
               <ProtectedRoute modulo="dashboard">
                 <DashboardPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/alterar-senha"
+            element={
+              <ProtectedRoute>
+                <AlterarSenhaPage />
               </ProtectedRoute>
             }
           />
