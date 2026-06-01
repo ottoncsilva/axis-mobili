@@ -23,8 +23,6 @@ RUN cd client && npm run build
 # Build backend
 RUN cd server && npm run build
 
----
-
 # Runtime stage
 FROM node:20-alpine
 
