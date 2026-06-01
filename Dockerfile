@@ -4,12 +4,10 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 
 # Copy package files
-COPY package*.json ./
 COPY client/package*.json ./client/
 COPY server/package*.json ./server/
 
 # Install dependencies
-RUN npm install --legacy-peer-deps
 RUN cd client && npm install --legacy-peer-deps
 RUN cd server && npm install --legacy-peer-deps
 
