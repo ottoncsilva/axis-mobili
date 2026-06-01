@@ -2,6 +2,7 @@ import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { configuracoesService } from './services/configuracoes.service.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -11,6 +12,14 @@ const fastify = Fastify({
 });
 
 async function start() {
+  // Initialize default configurations
+  try {
+    await configuracoesService.inicializar();
+    console.log('✅ Configurações inicializadas');
+  } catch (err) {
+    fastify.log.error('Erro ao inicializar configurações:', err);
+  }
+
   // CORS
   await fastify.register(cors, {
     origin: process.env.NODE_ENV === 'production'
@@ -31,6 +40,8 @@ async function start() {
   await fastify.register(clientesRoutes, { prefix: '/api' });
   const { projetosRoutes } = await import('./routes/projetos.routes.js');
   await fastify.register(projetosRoutes, { prefix: '/api' });
+  const { configuracoesRoutes } = await import('./routes/configuracoes.routes.js');
+  await fastify.register(configuracoesRoutes, { prefix: '/api' });
 
   // In production, serve the frontend build as static files
   if (process.env.NODE_ENV === 'production') {

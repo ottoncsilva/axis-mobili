@@ -47,3 +47,56 @@ export interface ConfigFeriados {
   feriadosPadrao: Feriado[];
   feriadosCustom: Feriado[];
 }
+
+export interface EtapaConfig {
+  id: string;
+  nome: string;
+  label: string;
+  ordem: number;
+  sla: number;
+  responsavelPadrao?: string;
+}
+
+export interface ConfigEtapas {
+  projetoVenda: EtapaConfig[];
+  projetoExecutivo: EtapaConfig[];
+  medicao: EtapaConfig[];
+}
+
+export interface PermissoesModulo {
+  visualizar: boolean;
+  criar: boolean;
+  editar: boolean;
+  excluir: boolean;
+}
+
+export interface PermissoesPerfil {
+  dashboard: boolean;
+  clientes: PermissoesModulo;
+  projetos: PermissoesModulo;
+  kanbanVenda: { visualizar: boolean; operar: boolean };
+  kanbanExecutivo: { visualizar: boolean; operar: boolean };
+  kanbanMedicao: { visualizar: boolean; operar: boolean };
+  faturamento: { visualizar: boolean; criar: boolean; editar: boolean };
+  colaboradores: PermissoesModulo;
+  relatorios: boolean;
+  configuracoes: boolean;
+}
+
+export interface ConfigEvolutionAPI {
+  ativo: boolean;
+  apiUrl: string;
+  apiKey: string;
+  instancia: string;
+  telefonesAlerta: string[];
+}
+
+export interface ConfigNotificacoes {
+  alertaSLADias: number;
+  notificarNovaAtribuicao: boolean;
+  notificarEtapaConcluida: boolean;
+  notificarSLAProximo: boolean;
+  notificarSLAEstourado: boolean;
+  notificarFaturaVencida: boolean;
+  evolution: ConfigEvolutionAPI;
+}
