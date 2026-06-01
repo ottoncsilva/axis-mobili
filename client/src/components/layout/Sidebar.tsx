@@ -49,7 +49,7 @@ interface SidebarProps {
 }
 
 export function Sidebar({ collapsed, onToggle }: SidebarProps) {
-  const { user, logout } = useAuth();
+  const { usuario: user, logout } = useAuth();
   const { canAccess } = usePermissions();
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();

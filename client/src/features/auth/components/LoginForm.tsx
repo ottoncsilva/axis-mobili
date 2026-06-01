@@ -4,22 +4,23 @@ import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, LogIn, Loader2 } from 'lucide-react';
 
 export function LoginForm() {
-  const { login, error, clearError } = useAuth();
+  const { login } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    clearError();
+    setError(null);
     setIsLoading(true);
     try {
       await login(email, password);
       navigate('/dashboard');
-    } catch {
-      // Error is handled in the auth context
+    } catch (err: any) {
+      setError(err?.message || 'Erro ao fazer login');
     } finally {
       setIsLoading(false);
     }

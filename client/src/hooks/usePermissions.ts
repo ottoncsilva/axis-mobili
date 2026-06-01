@@ -5,12 +5,12 @@ import { useAuth } from '@/features/auth/hooks/useAuth';
 import type { Configuracoes, PermissoesPerfil } from '@/types/global.types';
 
 export function usePermissions() {
-  const { user } = useAuth();
+  const { usuario } = useAuth();
   const [permissoes, setPermissoes] = useState<PermissoesPerfil | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!user) {
+    if (!usuario) {
       setPermissoes(null);
       setLoading(false);
       return;
@@ -21,7 +21,7 @@ export function usePermissions() {
         const configDoc = await getDoc(doc(db, 'configuracoes', 'geral'));
         if (configDoc.exists()) {
           const config = configDoc.data() as Configuracoes;
-          const perfilPermissoes = config.permissoes?.[user.perfil];
+          const perfilPermissoes = config.permissoes?.[usuario.perfil];
           setPermissoes(perfilPermissoes || null);
         }
       } catch (err) {
@@ -32,13 +32,13 @@ export function usePermissions() {
     };
 
     fetchPermissoes();
-  }, [user]);
+  }, [usuario]);
 
   const canAccess = (modulo: string, acao: string = 'visualizar'): boolean => {
-    if (!user || !permissoes) return false;
+    if (!usuario || !permissoes) return false;
 
     // Admin has access to everything
-    if (user.perfil === 'admin') return true;
+    if (usuario.perfil === 'admin') return true;
 
     const moduloPermissoes = permissoes[modulo as keyof PermissoesPerfil];
 

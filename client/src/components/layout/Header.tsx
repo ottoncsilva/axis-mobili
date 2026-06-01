@@ -17,7 +17,7 @@ const PAGE_TITLES: Record<string, string> = {
 };
 
 export function Header() {
-  const { user, logout } = useAuth();
+  const { usuario: user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [showUserMenu, setShowUserMenu] = useState(false);
