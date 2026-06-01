@@ -3,6 +3,7 @@ import cors from '@fastify/cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { configuracoesService } from './services/configuracoes.service.js';
+import authService from './services/auth.service.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -18,6 +19,13 @@ async function start() {
     console.log('✅ Configurações inicializadas');
   } catch (err) {
     fastify.log.error('Erro ao inicializar configurações:', err);
+  }
+
+  // Create default admin user
+  try {
+    await authService.criarAdminPadrao();
+  } catch (err) {
+    fastify.log.error('Erro ao criar admin padrão:', err);
   }
 
   // CORS
@@ -36,6 +44,8 @@ async function start() {
   }));
 
   // API routes
+  const { authRoutes } = await import('./routes/auth.routes.js');
+  await fastify.register(authRoutes, { prefix: '/api/auth' });
   const { clientesRoutes } = await import('./routes/clientes.routes.js');
   await fastify.register(clientesRoutes, { prefix: '/api' });
   const { projetosRoutes } = await import('./routes/projetos.routes.js');
