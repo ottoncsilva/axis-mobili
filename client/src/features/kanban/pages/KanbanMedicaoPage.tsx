@@ -7,7 +7,8 @@ import { AtribuirResponsavelModal } from '../components/AtribuirResponsavelModal
 import { Button } from '@/components/ui/button';
 import { Plus, RefreshCw } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
-import { adminDb } from '@/lib/firebase';
+import { db } from '@/lib/firebase';
+import { collection, getDocs } from 'firebase/firestore';
 
 export function KanbanMedicaoPage() {
   const [projetoSelecionado, setProjetoSelecionado] = useState<Projeto | null>(null);
@@ -23,7 +24,7 @@ export function KanbanMedicaoPage() {
   const { data: usuarios = [] } = useQuery({
     queryKey: ['usuarios'],
     queryFn: async () => {
-      const snap = await adminDb.collection('usuarios').get();
+      const snap = await getDocs(collection(db, 'usuarios'));
       return snap.docs.map((doc) => ({ id: doc.id, ...doc.data() } as any));
     },
   });
