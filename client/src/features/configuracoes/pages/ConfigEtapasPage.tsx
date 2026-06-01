@@ -183,7 +183,6 @@ export function ConfigEtapasPage() {
         <Button
           onClick={handleSave}
           disabled={updateEtapas.isPending}
-          loading={updateEtapas.isPending}
           className="gap-2"
         >
           <Save className="w-4 h-4" />

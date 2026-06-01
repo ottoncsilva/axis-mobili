@@ -233,7 +233,6 @@ export function ConfigPermissoesPage() {
         <Button
           onClick={handleSave}
           disabled={updatePermissoes.isPending}
-          loading={updatePermissoes.isPending}
           className="gap-2"
         >
           <Save className="w-4 h-4" />

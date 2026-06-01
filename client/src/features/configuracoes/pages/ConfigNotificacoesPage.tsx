@@ -303,7 +303,6 @@ export function ConfigNotificacoesPage() {
         <Button
           onClick={handleSave}
           disabled={updateConfig.isPending}
-          loading={updateConfig.isPending}
           className="gap-2"
         >
           <Save className="w-4 h-4" />
