@@ -11,6 +11,7 @@ export interface Usuario {
   ativo: boolean;
   telefone?: string;
   avatarUrl?: string;
+  responsabilidades?: string[]; // IDs de projetos que o usuário é responsável
   criadoEm: Timestamp;
   atualizadoEm: Timestamp;
 }
@@ -31,6 +32,12 @@ export interface Contato {
 export interface PrecificacaoConfig {
   tipo: TipoPrecificacao;
   valor: number;
+}
+
+export interface ConfigFaturamento {
+  tipo: 'mensal' | 'por_projeto';
+  percentualEntrada?: number; // Ex: 50 (para 50%)
+  diaFaturamento?: number; // Dia do mês para faturamento mensal (1-31)
 }
 
 export interface Cliente {
@@ -55,17 +62,65 @@ export interface Cliente {
     projetoExecutivo: PrecificacaoConfig;
     medicao: PrecificacaoConfig;
   };
+  faturamento: ConfigFaturamento;
   observacoes?: string;
   ativo: boolean;
   criadoEm: Timestamp;
   atualizadoEm: Timestamp;
 }
 
+// ===== CONFIGURAÇÕES DE ETAPAS =====
+export interface EtapaConfig {
+  id: string;
+  nome: string;
+  label: string;
+  ordem: number;
+  sla: number; // em dias úteis
+  responsavelPadrao?: string; // UID do responsável padrão
+}
+
+export interface ConfigEtapas {
+  projetoVenda: EtapaConfig[];
+  projetoExecutivo: EtapaConfig[];
+  medicao: EtapaConfig[];
+}
+
+// Modelos padrão (sugestão)
+export const ETAPAS_PADRAO_VENDA: EtapaConfig[] = [
+  { id: 'aguardando_inicio', nome: 'aguardando_inicio', label: 'Aguardando Início', ordem: 1, sla: 1 },
+  { id: 'projetar_ambientes', nome: 'projetar_ambientes', label: 'Projetar Ambientes', ordem: 2, sla: 5 },
+  { id: 'projetar_mobiliario', nome: 'projetar_mobiliario', label: 'Projetar Mobiliário', ordem: 3, sla: 5 },
+  { id: 'aprovacao', nome: 'aprovacao', label: 'Aprovação', ordem: 4, sla: 3 },
+  { id: 'renderizar', nome: 'renderizar', label: 'Renderizar', ordem: 5, sla: 3 },
+  { id: 'montar_apresentacao', nome: 'montar_apresentacao', label: 'Montar Apresentação', ordem: 6, sla: 2 },
+  { id: 'alteracao', nome: 'alteracao', label: 'Alteração', ordem: 7, sla: 5 },
+  { id: 'concluido', nome: 'concluido', label: 'Concluído', ordem: 8, sla: 0 },
+];
+
+export const ETAPAS_PADRAO_EXECUTIVO: EtapaConfig[] = [
+  { id: 'aguardando_inicio', nome: 'aguardando_inicio', label: 'Aguardando Início', ordem: 1, sla: 1 },
+  { id: 'projetar_ambientes', nome: 'projetar_ambientes', label: 'Projetar Ambientes', ordem: 2, sla: 5 },
+  { id: 'projetar_mobiliario', nome: 'projetar_mobiliario', label: 'Projetar Mobiliário', ordem: 3, sla: 5 },
+  { id: 'aprovacao_1', nome: 'aprovacao_1', label: 'Aprovação', ordem: 4, sla: 3 },
+  { id: 'detalhamento', nome: 'detalhamento', label: 'Detalhamento', ordem: 5, sla: 5 },
+  { id: 'aprovacao_2', nome: 'aprovacao_2', label: 'Aprovação Final', ordem: 6, sla: 3 },
+  { id: 'alteracao', nome: 'alteracao', label: 'Alteração', ordem: 7, sla: 5 },
+  { id: 'concluido', nome: 'concluido', label: 'Concluído', ordem: 8, sla: 0 },
+];
+
+export const ETAPAS_PADRAO_MEDICAO: EtapaConfig[] = [
+  { id: 'aguardando_medicao', nome: 'aguardando_medicao', label: 'Aguardando Medição', ordem: 1, sla: 3 },
+  { id: 'medicao_agendada', nome: 'medicao_agendada', label: 'Medição Agendada', ordem: 2, sla: 5 },
+  { id: 'medicao_realizada', nome: 'medicao_realizada', label: 'Medição Realizada', ordem: 3, sla: 2 },
+  { id: 'consolidado_enviado', nome: 'consolidado_enviado', label: 'Consolidado e Enviado', ordem: 4, sla: 1 },
+  { id: 'concluido', nome: 'concluido', label: 'Concluído', ordem: 5, sla: 0 },
+];
+
 // ===== PROJETOS =====
 export type TipoServico = 'projeto_venda' | 'projeto_executivo' | 'medicao';
 export type StatusFaturamento = 'em_andamento' | 'pronto_para_faturar' | 'faturado';
 
-// Etapas do Kanban
+// Etapas do Kanban (mantém os antigos para compatibilidade)
 export const ETAPAS_PROJETO_VENDA = [
   'aguardando_inicio',
   'projetar_ambientes',
@@ -122,6 +177,23 @@ export interface Ambiente {
   etapasConcluidas: Record<string, boolean>;
 }
 
+export interface Etapa {
+  id: string;
+  nome: string;
+  label: string;
+  ordem: number;
+  status: 'pendente' | 'em_progresso' | 'concluido';
+  responsavel?: {
+    uid: string;
+    nome: string;
+    email: string;
+  };
+  sla: number; // dias úteis
+  dataInicio?: Timestamp;
+  dataFim?: Timestamp;
+  diasUtilizados?: number;
+}
+
 export interface HistoricoItem {
   id: string;
   data: Timestamp;
@@ -152,21 +224,15 @@ export interface Projeto {
     };
   };
   ambientes: Ambiente[];
+  etapas: Etapa[]; // Etapas dinâmicas com responsáveis
   etapaAtual: string;
   valorVenda?: number;
   valorFabrica?: number;
   valorCombinado?: number;
   valorCalculado?: number;
   linkGoogleDrive?: string;
-  responsaveis: Record<string, string>;
-  sla: {
-    etapaInicio: Timestamp;
-    prazoEtapa: number;
-    diasUtilizados: number;
-  };
   statusFaturamento: StatusFaturamento;
   faturaId?: string;
-  etapaRetornoAlteracao?: string;
   historico: HistoricoItem[];
   observacoes?: string;
   criadoEm: Timestamp;
@@ -194,12 +260,16 @@ export interface Fatura {
   numero: string;
   clienteId: string;
   clienteNome: string;
+  tipo: 'mensal' | 'por_projeto';
+  projetosIds: string[]; // IDs dos projetos inclusos
   periodoInicio: Timestamp;
   periodoFim: Timestamp;
   itens: FaturaItem[];
   subtotalProjetoVenda: number;
   subtotalProjetoExecutivo: number;
   subtotalMedicao: number;
+  percentualEntrada?: number; // Ex: 50 (para 50%)
+  valorEntrada?: number;
   valorTotal: number;
   status: StatusFatura;
   dataEmissao?: Timestamp;
@@ -240,6 +310,24 @@ export interface PermissoesPerfil {
   configuracoes: boolean;
 }
 
+export interface ConfigEvolutionAPI {
+  ativo: boolean;
+  apiUrl: string;
+  apiKey: string;
+  instancia: string;
+  telefonesAlerta: string[]; // Números pra receber alertas
+}
+
+export interface ConfigNotificacoes {
+  alertaSLADias: number; // Dias antes de vencer para alertar
+  notificarNovaAtribuicao: boolean;
+  notificarEtapaConcluida: boolean;
+  notificarSLAProximo: boolean;
+  notificarSLAEstourado: boolean;
+  notificarFaturaVencida: boolean;
+  evolution: ConfigEvolutionAPI; // Integração com EvolutionAPI
+}
+
 export interface Configuracoes {
   empresa: {
     nome: string;
@@ -250,25 +338,14 @@ export interface Configuracoes {
     logoUrl?: string;
   };
   permissoes: Record<PerfilUsuario, PermissoesPerfil>;
-  sla: {
-    projetoVenda: Record<string, number>;
-    projetoExecutivo: Record<string, number>;
-    medicao: Record<string, number>;
-  };
+  etapas: ConfigEtapas; // Configurações de etapas por tipo de projeto
   feriados: {
     sabadoDiaUtil: boolean;
     feriadosPadrao: Feriado[];
     feriadosCustom: Feriado[];
   };
   tema: 'claro' | 'escuro';
-  notificacoes: {
-    alertaSLADias: number;
-    notificarNovaAtribuicao: boolean;
-    notificarEtapaConcluida: boolean;
-    notificarSLAProximo: boolean;
-    notificarSLAEstourado: boolean;
-    notificarFaturaVencida: boolean;
-  };
+  notificacoes: ConfigNotificacoes;
 }
 
 // ===== NOTIFICAÇÕES =====

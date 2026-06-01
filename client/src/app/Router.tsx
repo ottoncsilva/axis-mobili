@@ -2,10 +2,26 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { LoginForm } from '@/features/auth/components/LoginForm';
 import { ProtectedRoute } from '@/features/auth/components/ProtectedRoute';
+
+// Clientes
 import { ClientesListPage } from '@/features/clientes/components/ClientesListPage';
 import { ClienteDetailPage } from '@/features/clientes/components/ClienteDetailPage';
+
+// Projetos
 import { ProjetosListPage } from '@/features/projetos/components/ProjetosListPage';
 import { ProjetoDetailPage } from '@/features/projetos/components/ProjetoDetailPage';
+
+// Kanban
+import { KanbanVendaPage } from '@/features/kanban/pages/KanbanVendaPage';
+import { KanbanMedicaoPage } from '@/features/kanban/pages/KanbanMedicaoPage';
+
+// Dashboard
+import { DashboardPage } from '@/features/dashboard/pages/DashboardPage';
+
+// Configurações
+import { ConfigEtapasPage } from '@/features/configuracoes/pages/ConfigEtapasPage';
+import { ConfigPermissoesPage } from '@/features/configuracoes/pages/ConfigPermissoesPage';
+import { ConfigNotificacoesPage } from '@/features/configuracoes/pages/ConfigNotificacoesPage';
 
 // Placeholder pages for modules not yet implemented
 function PlaceholderPage({ title }: { title: string }) {
@@ -43,7 +59,7 @@ export function Router() {
             path="/dashboard"
             element={
               <ProtectedRoute modulo="dashboard">
-                <PlaceholderPage title="Dashboard" />
+                <DashboardPage />
               </ProtectedRoute>
             }
           />
@@ -86,15 +102,7 @@ export function Router() {
             path="/kanban/venda"
             element={
               <ProtectedRoute modulo="kanbanVenda">
-                <PlaceholderPage title="Kanban — Projetos para Venda" />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/kanban/executivo"
-            element={
-              <ProtectedRoute modulo="kanbanExecutivo">
-                <PlaceholderPage title="Kanban — Projetos Executivos" />
+                <KanbanVendaPage />
               </ProtectedRoute>
             }
           />
@@ -102,7 +110,7 @@ export function Router() {
             path="/kanban/medicao"
             element={
               <ProtectedRoute modulo="kanbanMedicao">
-                <PlaceholderPage title="Kanban — Medição Técnica" />
+                <KanbanMedicaoPage />
               </ProtectedRoute>
             }
           />
@@ -142,14 +150,12 @@ export function Router() {
             }
           />
 
-          <Route
-            path="/configuracoes"
-            element={
-              <ProtectedRoute modulo="configuracoes">
-                <PlaceholderPage title="Configurações" />
-              </ProtectedRoute>
-            }
-          />
+          <Route path="/configuracoes" element={<ProtectedRoute modulo="configuracoes"><div /></ProtectedRoute>}>
+            <Route index element={<Navigate to="/configuracoes/etapas" replace />} />
+            <Route path="etapas" element={<ConfigEtapasPage />} />
+            <Route path="permissoes" element={<ConfigPermissoesPage />} />
+            <Route path="notificacoes" element={<ConfigNotificacoesPage />} />
+          </Route>
 
           {/* 404 */}
           <Route
