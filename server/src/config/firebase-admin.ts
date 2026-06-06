@@ -1,8 +1,11 @@
-import * as admin from 'firebase-admin';
+import { initializeApp, getApps, cert, App } from 'firebase-admin/app';
+import { getAuth } from 'firebase-admin/auth';
+import { getFirestore } from 'firebase-admin/firestore';
+import { getStorage } from 'firebase-admin/storage';
 
-function initializeFirebaseAdmin() {
-  if (admin.apps.length > 0) {
-    return admin.apps[0]!;
+function initializeFirebaseAdmin(): App {
+  if (getApps().length > 0) {
+    return getApps()[0];
   }
 
   const serviceAccountKey = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
@@ -12,8 +15,8 @@ function initializeFirebaseAdmin() {
       const serviceAccount = JSON.parse(
         Buffer.from(serviceAccountKey, 'base64').toString('utf-8')
       );
-      return admin.initializeApp({
-        credential: admin.credential.cert(serviceAccount),
+      return initializeApp({
+        credential: cert(serviceAccount),
       });
     } catch (error) {
       console.error('Erro ao inicializar Firebase Admin com service account:', error);
@@ -21,16 +24,11 @@ function initializeFirebaseAdmin() {
     }
   }
 
-  // Fallback for local development with GOOGLE_APPLICATION_CREDENTIALS env var
-  return admin.initializeApp({
-    credential: admin.credential.applicationDefault(),
-  });
+  return initializeApp();
 }
 
-const app = initializeFirebaseAdmin();
+initializeFirebaseAdmin();
 
-export const adminAuth = admin.auth();
-export const adminDb = admin.firestore();
-export const adminStorage: admin.storage.Storage = admin.storage();
-
-export default app;
+export const adminAuth = getAuth();
+export const adminDb = getFirestore();
+export const adminStorage = getStorage();
