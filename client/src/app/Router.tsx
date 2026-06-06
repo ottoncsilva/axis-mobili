@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { LoginPage } from '@/features/auth/pages/LoginPage';
 import { AlterarSenhaPage } from '@/features/auth/pages/AlterarSenhaPage';
@@ -14,6 +14,7 @@ import { ProjetoDetailPage } from '@/features/projetos/components/ProjetoDetailP
 
 // Kanban
 import { KanbanVendaPage } from '@/features/kanban/pages/KanbanVendaPage';
+import { KanbanExecutivoPage } from '@/features/kanban/pages/KanbanExecutivoPage';
 import { KanbanMedicaoPage } from '@/features/kanban/pages/KanbanMedicaoPage';
 
 // Dashboard
@@ -116,6 +117,14 @@ export function Router() {
             }
           />
           <Route
+            path="/kanban/executivo"
+            element={
+              <ProtectedRoute modulo="kanbanExecutivo">
+                <KanbanExecutivoPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/kanban/medicao"
             element={
               <ProtectedRoute modulo="kanbanMedicao">
@@ -159,7 +168,7 @@ export function Router() {
             }
           />
 
-          <Route path="/configuracoes" element={<ProtectedRoute modulo="configuracoes"><div /></ProtectedRoute>}>
+          <Route path="/configuracoes" element={<ProtectedRoute modulo="configuracoes"><Outlet /></ProtectedRoute>}>
             <Route index element={<Navigate to="/configuracoes/etapas" replace />} />
             <Route path="etapas" element={<ConfigEtapasPage />} />
             <Route path="permissoes" element={<ConfigPermissoesPage />} />
