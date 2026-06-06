@@ -25,6 +25,9 @@ import { ConfigEtapasPage } from '@/features/configuracoes/pages/ConfigEtapasPag
 import { ConfigPermissoesPage } from '@/features/configuracoes/pages/ConfigPermissoesPage';
 import { ConfigNotificacoesPage } from '@/features/configuracoes/pages/ConfigNotificacoesPage';
 
+// Colaboradores
+import { ColaboradoresListPage } from '@/features/colaboradores/components/ColaboradoresListPage';
+
 // Placeholder pages for modules not yet implemented
 function PlaceholderPage({ title }: { title: string }) {
   return (
@@ -154,7 +157,7 @@ export function Router() {
             path="/colaboradores"
             element={
               <ProtectedRoute modulo="colaboradores">
-                <PlaceholderPage title="Colaboradores" />
+                <ColaboradoresListPage />
               </ProtectedRoute>
             }
           />
