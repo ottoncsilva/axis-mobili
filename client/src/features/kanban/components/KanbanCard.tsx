@@ -37,15 +37,15 @@ export function KanbanCard({ projeto, etapaAtual, onSelect, slaAlerta }: KanbanC
       {...listeners}
       onClick={() => onSelect(projeto)}
       className={`p-3 cursor-grab active:cursor-grabbing transition-all ${
-        isDragging ? 'shadow-lg ring-2 ring-blue-400' : 'hover:shadow-md'
-      } ${slaAlerta ? 'ring-2 ring-red-400 bg-red-50' : ''}`}
+        isDragging ? 'shadow-lg ring-2 ring-brand-400' : 'hover:shadow-md'
+      } ${slaAlerta ? 'ring-2 ring-red-400 bg-red-50 dark:bg-red-900/10' : ''}`}
     >
       <div className="space-y-2">
         {/* Header */}
         <div className="flex items-start justify-between gap-2">
           <div className="flex-1 min-w-0">
             <h4 className="font-semibold text-sm truncate">{projeto.clienteFinal.nome}</h4>
-            <p className="text-xs text-gray-500 truncate">{projeto.clienteNome}</p>
+            <p className="text-xs text-muted-foreground truncate">{projeto.clienteNome}</p>
           </div>
           {slaAlerta && (
             <AlertTriangle className="w-4 h-4 text-red-500 flex-shrink-0" />
@@ -78,18 +78,18 @@ export function KanbanCard({ projeto, etapaAtual, onSelect, slaAlerta }: KanbanC
 
         {/* SLA e Valor */}
         <div className="flex items-center justify-between text-xs">
-          <span className={`font-semibold ${slaAlerta ? 'text-red-600' : 'text-gray-600'}`}>
+          <span className={`font-semibold ${slaAlerta ? 'text-red-600' : 'text-muted-foreground'}`}>
             SLA: {diasRestantes}d
           </span>
           {projeto.valorCalculado && (
-            <span className="text-green-600 font-semibold">
+            <span className="text-brand-600 dark:text-brand-400 font-semibold">
               R$ {projeto.valorCalculado.toLocaleString('pt-BR')}
             </span>
           )}
         </div>
 
         {/* Data criação */}
-        <p className="text-xs text-gray-400">
+        <p className="text-xs text-muted-foreground/70">
           {formatDistanceToNow(projeto.criadoEm.toDate(), { locale: ptBR, addSuffix: true })}
         </p>
       </div>

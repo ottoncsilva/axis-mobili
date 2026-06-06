@@ -233,7 +233,7 @@ export function ClienteDetailPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
               { label: 'Total Faturado', valor: 'R$ 0,00', color: 'text-foreground' },
-              { label: 'Total Pago', valor: 'R$ 0,00', color: 'text-green-500' },
+              { label: 'Total Pago', valor: 'R$ 0,00', color: 'text-brand-600 dark:text-brand-400' },
               { label: 'Total Pendente', valor: 'R$ 0,00', color: 'text-yellow-500' },
               { label: 'Total Vencido', valor: 'R$ 0,00', color: 'text-red-500' },
             ].map((item) => (

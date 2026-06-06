@@ -57,81 +57,93 @@ export function DashboardPage() {
     })
     .slice(0, 5);
 
-  const COLORS = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899'];
+  const COLORS = ['#2563EB', '#1D4ED8', '#3B82F6', '#1E40AF', '#60A5FA', '#1E3A8A'];
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">Dashboard</h1>
-        <p className="text-gray-500 mt-1">Visão geral do sistema</p>
+        <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Dashboard</h1>
+        <p className="text-muted-foreground mt-1">Visão geral do sistema</p>
       </div>
 
       {/* KPIs */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <Card className="p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs text-gray-500 font-semibold">TOTAL DE PROJETOS</p>
-              <p className="text-2xl font-bold mt-1">{stats.totalProjetos}</p>
+              <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wide">Total de Projetos</p>
+              <p className="text-2xl font-bold mt-1 text-foreground">{stats.totalProjetos}</p>
             </div>
-            <TrendingUp className="w-8 h-8 text-blue-500" />
+            <div className="w-10 h-10 rounded-xl bg-brand-100 dark:bg-brand-900/30 flex items-center justify-center flex-shrink-0">
+              <TrendingUp className="w-5 h-5 text-brand-600 dark:text-brand-400" />
+            </div>
           </div>
         </Card>
 
         <Card className="p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs text-gray-500 font-semibold">EM ANDAMENTO</p>
-              <p className="text-2xl font-bold mt-1">{stats.emAndamento}</p>
+              <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wide">Em Andamento</p>
+              <p className="text-2xl font-bold mt-1 text-foreground">{stats.emAndamento}</p>
             </div>
-            <Clock className="w-8 h-8 text-amber-500" />
+            <div className="w-10 h-10 rounded-xl bg-brand-50 dark:bg-brand-900/20 flex items-center justify-center flex-shrink-0">
+              <Clock className="w-5 h-5 text-brand-500 dark:text-brand-300" />
+            </div>
           </div>
         </Card>
 
         <Card className="p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs text-gray-500 font-semibold">CONCLUÍDOS</p>
-              <p className="text-2xl font-bold mt-1">{stats.concluidos}</p>
+              <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wide">Concluídos</p>
+              <p className="text-2xl font-bold mt-1 text-foreground">{stats.concluidos}</p>
             </div>
-            <TrendingUp className="w-8 h-8 text-green-500" />
+            <div className="w-10 h-10 rounded-xl bg-brand-100 dark:bg-brand-900/30 flex items-center justify-center flex-shrink-0">
+              <TrendingUp className="w-5 h-5 text-brand-700 dark:text-brand-400" />
+            </div>
           </div>
         </Card>
 
         <Card className="p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs text-gray-500 font-semibold">SLA EM RISCO</p>
-              <p className="text-2xl font-bold mt-1 text-red-600">{stats.emRisco}</p>
+              <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wide">SLA em Risco</p>
+              <p className="text-2xl font-bold mt-1 text-destructive">{stats.emRisco}</p>
             </div>
-            <AlertTriangle className="w-8 h-8 text-red-500" />
+            <div className="w-10 h-10 rounded-xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center flex-shrink-0">
+              <AlertTriangle className="w-5 h-5 text-red-500" />
+            </div>
           </div>
         </Card>
       </div>
 
       {/* Faturamento */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
         <Card className="p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs text-gray-500 font-semibold">FATURAMENTO PENDENTE</p>
-              <p className="text-2xl font-bold mt-1">
+              <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wide">Faturamento Pendente</p>
+              <p className="text-2xl font-bold mt-1 text-foreground">
                 R$ {stats.faturamentoPendente.toLocaleString('pt-BR')}
               </p>
             </div>
-            <DollarSign className="w-8 h-8 text-green-500" />
+            <div className="w-10 h-10 rounded-xl bg-brand-50 dark:bg-brand-900/20 flex items-center justify-center flex-shrink-0">
+              <DollarSign className="w-5 h-5 text-brand-600 dark:text-brand-400" />
+            </div>
           </div>
         </Card>
 
         <Card className="p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs text-gray-500 font-semibold">TOTAL EM PROJETOS</p>
-              <p className="text-2xl font-bold mt-1">
+              <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wide">Total em Projetos</p>
+              <p className="text-2xl font-bold mt-1 text-foreground">
                 R$ {stats.faturamentoTotal.toLocaleString('pt-BR')}
               </p>
             </div>
-            <DollarSign className="w-8 h-8 text-blue-500" />
+            <div className="w-10 h-10 rounded-xl bg-brand-100 dark:bg-brand-900/30 flex items-center justify-center flex-shrink-0">
+              <DollarSign className="w-5 h-5 text-brand-700 dark:text-brand-300" />
+            </div>
           </div>
         </Card>
       </div>
@@ -139,9 +151,9 @@ export function DashboardPage() {
       {/* Gráficos */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Projetos por Tipo */}
-        <Card className="p-4">
-          <h3 className="font-semibold mb-4">Projetos por Tipo</h3>
-          <ResponsiveContainer width="100%" height={300}>
+        <Card className="p-4 sm:p-6">
+          <h3 className="font-semibold mb-4 text-foreground">Projetos por Tipo</h3>
+          <ResponsiveContainer width="100%" height={280}>
             <PieChart>
               <Pie
                 data={projetosPorTipo}
@@ -149,8 +161,8 @@ export function DashboardPage() {
                 cy="50%"
                 labelLine={false}
                 label={({ name, value }) => `${name}: ${value}`}
-                outerRadius={80}
-                fill="#8884d8"
+                outerRadius={90}
+                fill="#2563EB"
                 dataKey="value"
               >
                 {projetosPorTipo.map((entry, index) => (
@@ -163,29 +175,29 @@ export function DashboardPage() {
         </Card>
 
         {/* Projetos por Etapa */}
-        <Card className="p-4">
-          <h3 className="font-semibold mb-4">Distribuição por Etapa</h3>
-          <ResponsiveContainer width="100%" height={300}>
+        <Card className="p-4 sm:p-6">
+          <h3 className="font-semibold mb-4 text-foreground">Distribuição por Etapa</h3>
+          <ResponsiveContainer width="100%" height={280}>
             <BarChart data={projetosPorEtapa}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" angle={-45} textAnchor="end" height={80} />
-              <YAxis />
-              <Tooltip />
-              <Bar dataKey="value" fill="#3b82f6" />
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+              <XAxis dataKey="name" angle={-45} textAnchor="end" height={80} tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} />
+              <YAxis tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }} />
+              <Tooltip contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 8, color: 'hsl(var(--foreground))' }} />
+              <Bar dataKey="value" fill="#2563EB" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </Card>
       </div>
 
       {/* Projetos em Risco */}
-      <Card className="p-6">
+      <Card className="p-4 sm:p-6">
         <div className="flex items-center gap-2 mb-4">
           <AlertTriangle className="w-5 h-5 text-red-500" />
-          <h3 className="font-semibold">Projetos com SLA em Risco</h3>
+          <h3 className="font-semibold text-foreground">Projetos com SLA em Risco</h3>
         </div>
 
         {projetosRisco.length === 0 ? (
-          <p className="text-gray-500 text-sm">Nenhum projeto em risco</p>
+          <p className="text-muted-foreground text-sm">Nenhum projeto em risco</p>
         ) : (
           <div className="space-y-3">
             {projetosRisco.map((projeto) => {
@@ -193,13 +205,13 @@ export function DashboardPage() {
               return (
                 <div
                   key={projeto.id}
-                  className="flex items-center justify-between p-3 bg-red-50 border border-red-200 rounded-lg"
+                  className="flex items-center justify-between p-3 bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-900/30 rounded-lg"
                 >
-                  <div className="flex-1">
-                    <p className="font-semibold text-sm">{projeto.clienteFinal.nome}</p>
-                    <p className="text-xs text-gray-600">{projeto.clienteNome}</p>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-sm text-foreground truncate">{projeto.clienteFinal.nome}</p>
+                    <p className="text-xs text-muted-foreground truncate">{projeto.clienteNome}</p>
                   </div>
-                  <div className="text-right">
+                  <div className="ml-3 flex-shrink-0">
                     <Badge variant="destructive">SLA: {etapa?.sla || 0}d</Badge>
                   </div>
                 </div>

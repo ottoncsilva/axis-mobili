@@ -6,22 +6,22 @@ interface StatusBadgeProps {
 }
 
 const STATUS_STYLES: Record<string, string> = {
-  ativo: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-  inativo: 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400',
-  no_prazo: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
+  ativo: 'bg-brand-100 text-brand-700 dark:bg-brand-900/30 dark:text-brand-300',
+  inativo: 'bg-muted text-muted-foreground',
+  no_prazo: 'bg-brand-100 text-brand-700 dark:bg-brand-900/30 dark:text-brand-300',
   atencao: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
   atrasado: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
-  em_andamento: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-  pronto_para_faturar: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400',
-  faturado: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-  rascunho: 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400',
-  emitida: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-  paga: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-  cancelada: 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400',
+  em_andamento: 'bg-brand-50 text-brand-600 dark:bg-brand-900/20 dark:text-brand-400',
+  pronto_para_faturar: 'bg-brand-200 text-brand-800 dark:bg-brand-800/30 dark:text-brand-200',
+  faturado: 'bg-brand-100 text-brand-700 dark:bg-brand-900/30 dark:text-brand-300',
+  rascunho: 'bg-muted text-muted-foreground',
+  emitida: 'bg-brand-50 text-brand-600 dark:bg-brand-900/20 dark:text-brand-400',
+  paga: 'bg-brand-100 text-brand-700 dark:bg-brand-900/30 dark:text-brand-300',
+  cancelada: 'bg-muted text-muted-foreground',
   vencida: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
   projeto_venda: 'bg-brand-100 text-brand-800 dark:bg-brand-900/30 dark:text-brand-400',
-  projeto_executivo: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-  medicao: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400',
+  projeto_executivo: 'bg-brand-50 text-brand-600 dark:bg-brand-800/20 dark:text-brand-300',
+  medicao: 'bg-slate-100 text-slate-700 dark:bg-slate-800/30 dark:text-slate-400',
 };
 
 const STATUS_LABELS: Record<string, string> = {

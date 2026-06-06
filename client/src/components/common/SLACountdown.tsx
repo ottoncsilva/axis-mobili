@@ -23,9 +23,9 @@ export function SLACountdown({ inicioEtapa, prazoDiasUteis, compact = false, cla
     no_prazo: {
       icon: CheckCircle,
       label: 'No prazo',
-      bgClass: 'bg-green-100 dark:bg-green-900/30',
-      textClass: 'text-green-700 dark:text-green-400',
-      barClass: 'bg-green-500',
+      bgClass: 'bg-brand-100 dark:bg-brand-900/30',
+      textClass: 'text-brand-700 dark:text-brand-400',
+      barClass: 'bg-brand-500',
     },
     atencao: {
       icon: Clock,

@@ -611,7 +611,7 @@ export function ProjetoFormModal({ open, onClose, projeto }: Props) {
           {toast && (
             <div className={cn(
               'fixed bottom-6 right-6 z-[60] px-4 py-3 rounded-lg shadow-lg text-sm font-medium animate-fade-in',
-              toast.type === 'success' ? 'bg-green-600 text-white' : 'bg-destructive text-white'
+              toast.type === 'success' ? 'bg-brand-600 text-white' : 'bg-destructive text-white'
             )}>
               {toast.message}
             </div>
