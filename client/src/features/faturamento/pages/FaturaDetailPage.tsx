@@ -1,8 +1,10 @@
 import { useParams, useNavigate } from 'react-router-dom';
+import { PDFDownloadLink } from '@react-pdf/renderer';
 import { useFatura, useFaturasMutation } from '../hooks/useFaturas';
+import { FaturaPDFDocument } from '../components/FaturaPDF';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, FileText, CheckCheck, Ban, Send, Printer } from 'lucide-react';
+import { ArrowLeft, FileText, CheckCheck, Ban, Send, Printer, Download } from 'lucide-react';
 import { toast } from 'sonner';
 import type { StatusFatura } from '@/types/global.types';
 
@@ -156,6 +158,20 @@ export function FaturaDetailPage() {
             <Printer className="w-4 h-4" />
             Imprimir
           </button>
+          <PDFDownloadLink
+            document={<FaturaPDFDocument fatura={fatura} />}
+            fileName={`${fatura.numero}.pdf`}
+          >
+            {({ loading }) => (
+              <button
+                disabled={loading}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-border text-muted-foreground hover:text-foreground hover:bg-accent text-sm font-medium transition-all disabled:opacity-60"
+              >
+                <Download className="w-4 h-4" />
+                {loading ? 'Gerando...' : 'Exportar PDF'}
+              </button>
+            )}
+          </PDFDownloadLink>
         </div>
       </div>
 

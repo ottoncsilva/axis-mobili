@@ -6,7 +6,8 @@ export function useProjetos(tipoServico: TipoServico) {
   return useQuery({
     queryKey: ['projetos', tipoServico],
     queryFn: () => kanbanService.getProjetos(tipoServico),
-    refetchInterval: 30000, // Refetch a cada 30s
+    refetchInterval: 15000, // Refetch a cada 15s
+    refetchOnWindowFocus: true,
   });
 }
 
