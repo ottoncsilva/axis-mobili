@@ -8,6 +8,7 @@ export function useClientes(filtros?: ClientesFiltros) {
   return useQuery({
     queryKey: [QUERY_KEY, filtros],
     queryFn: () => clientesService.listar(filtros),
+    refetchInterval: 60_000,
   });
 }
 
@@ -16,6 +17,7 @@ export function useCliente(id: string) {
     queryKey: [QUERY_KEY, id],
     queryFn: () => clientesService.buscarPorId(id),
     enabled: !!id,
+    refetchInterval: 60_000,
   });
 }
 
@@ -52,6 +54,5 @@ export function useClientesSelect() {
   return useQuery({
     queryKey: [QUERY_KEY, 'select'],
     queryFn: () => clientesService.listarParaSelect(),
-    staleTime: 1000 * 60 * 5, // 5 minutos
   });
 }

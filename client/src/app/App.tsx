@@ -7,9 +7,12 @@ import { Router } from './Router';
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 1000 * 60 * 2, // 2 minutes
+      staleTime: 0,           // Always consider cached data stale — refetch on every mount
+      gcTime: 1000 * 60 * 5,  // Keep in memory 5min to avoid loading flicker between pages
       retry: 1,
-      refetchOnWindowFocus: false,
+      refetchOnWindowFocus: true,    // Refetch when user returns to the tab
+      refetchOnMount: true,          // Refetch every time a component mounts
+      refetchOnReconnect: true,      // Refetch after network reconnect
     },
   },
 });

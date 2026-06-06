@@ -8,6 +8,7 @@ export function useProjetos(filtros?: ProjetosFiltros) {
   return useQuery({
     queryKey: [QUERY_KEY, filtros],
     queryFn: () => projetosService.listar(filtros),
+    refetchInterval: 60_000,
   });
 }
 
@@ -16,6 +17,7 @@ export function useProjeto(id: string) {
     queryKey: [QUERY_KEY, id],
     queryFn: () => projetosService.buscarPorId(id),
     enabled: !!id,
+    refetchInterval: 60_000,
   });
 }
 
@@ -45,5 +47,6 @@ export function useProjetosPorCliente(clienteId: string) {
     queryKey: [QUERY_KEY, 'cliente', clienteId],
     queryFn: () => projetosService.listarPorCliente(clienteId),
     enabled: !!clienteId,
+    refetchInterval: 60_000,
   });
 }
