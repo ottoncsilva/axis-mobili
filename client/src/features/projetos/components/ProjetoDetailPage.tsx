@@ -23,8 +23,11 @@ import {
   CheckCircle2,
   Circle,
   Clock,
+  Pencil,
+  UserCheck,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { ProjetoFormModal } from './ProjetoFormModal';
 
 const TIPO_LABELS: Record<TipoServico, string> = {
   projeto_venda: 'Projeto para Venda',
@@ -46,11 +49,20 @@ function getEtapasParaTipo(tipo: TipoServico) {
   }
 }
 
+function tsToDate(ts: any): Date {
+  if (!ts) return new Date();
+  if (ts instanceof Date) return ts;
+  if (typeof ts.toDate === 'function') return ts.toDate();
+  if (ts._seconds !== undefined) return new Date(ts._seconds * 1000);
+  return new Date(ts);
+}
+
 export function ProjetoDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { data: projeto, isLoading } = useProjeto(id || '');
   const [activeTab, setActiveTab] = useState('info');
+  const [editModalOpen, setEditModalOpen] = useState(false);
 
   if (isLoading) {
     return (
@@ -77,8 +89,19 @@ export function ProjetoDetailPage() {
     );
   }
 
-  const etapasTipo = getEtapasParaTipo(projeto.tipoServico);
-  const etapaAtualIndex = etapasTipo.indexOf(projeto.etapaAtual as 'concluido');
+  // Use etapas dinâmicas do Firestore quando disponíveis, fallback para constantes
+  const etapasDoProjeto = projeto.etapas?.length
+    ? projeto.etapas.map((e) => e.nome)
+    : getEtapasParaTipo(projeto.tipoServico);
+
+  const labelsEtapas: Record<string, string> = projeto.etapas?.length
+    ? Object.fromEntries(projeto.etapas.map((e) => [e.nome, e.label]))
+    : ETAPAS_LABELS;
+
+  const etapaAtualIndex = etapasDoProjeto.indexOf(projeto.etapaAtual);
+
+  // Config da etapa atual para SLA
+  const etapaAtualConfig = projeto.etapas?.find((e) => e.nome === projeto.etapaAtual);
 
   const tabs = [
     { id: 'info', label: 'Informações', icon: FolderOpen },
@@ -121,13 +144,20 @@ export function ProjetoDetailPage() {
               Google Drive
             </a>
           )}
+          <button
+            onClick={() => setEditModalOpen(true)}
+            className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-foreground bg-secondary hover:bg-secondary/80 border border-border rounded-lg transition-all"
+          >
+            <Pencil className="h-4 w-4" />
+            Editar
+          </button>
         </div>
       </div>
 
       {/* Progress Steps */}
       <div className="p-4 rounded-lg border border-border bg-card">
         <div className="flex items-center gap-1 overflow-x-auto pb-1">
-          {etapasTipo.map((etapa, index) => {
+          {etapasDoProjeto.map((etapa, index) => {
             const isCurrent = etapa === projeto.etapaAtual;
             const isCompleted = index < etapaAtualIndex;
             return (
@@ -149,10 +179,10 @@ export function ProjetoDetailPage() {
                     'text-[10px] mt-1.5 text-center leading-tight',
                     isCurrent ? 'text-brand-600 font-semibold' : 'text-muted-foreground'
                   )}>
-                    {ETAPAS_LABELS[etapa] || etapa}
+                    {labelsEtapas[etapa] || etapa}
                   </span>
                 </div>
-                {index < etapasTipo.length - 1 && (
+                {index < etapasDoProjeto.length - 1 && (
                   <div className={cn(
                     'h-0.5 w-6 mx-1 mt-[-18px]',
                     index < etapaAtualIndex ? 'bg-brand-600' : 'bg-muted'
@@ -201,7 +231,7 @@ export function ProjetoDetailPage() {
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Etapa Atual</span>
-                  <span className="font-medium text-foreground">{ETAPAS_LABELS[projeto.etapaAtual]}</span>
+                  <span className="font-medium text-foreground">{labelsEtapas[projeto.etapaAtual] || projeto.etapaAtual}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Ambientes</span>
@@ -215,6 +245,18 @@ export function ProjetoDetailPage() {
                      'Faturado'}
                   </span>
                 </div>
+                {etapaAtualConfig && (
+                  <>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Dias na etapa</span>
+                      <span className="font-medium text-foreground">{etapaAtualConfig.diasUtilizados ?? 0} dias</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">SLA</span>
+                      <span className="font-medium text-foreground">{etapaAtualConfig.sla ?? 0} dias úteis</span>
+                    </div>
+                  </>
+                )}
                 {projeto.observacoes && (
                   <div className="pt-2 border-t border-border">
                     <span className="text-xs text-muted-foreground">Observações</span>
@@ -263,8 +305,38 @@ export function ProjetoDetailPage() {
               </div>
             </div>
 
+            {/* Responsáveis por Etapa */}
+            {projeto.etapas?.some((e) => e.responsavel) && (
+              <div className="p-5 rounded-lg border border-border bg-card space-y-4">
+                <h3 className="text-sm font-semibold text-foreground uppercase tracking-wider flex items-center gap-2">
+                  <UserCheck className="h-4 w-4 text-brand-500" />
+                  Responsáveis
+                </h3>
+                <div className="space-y-2">
+                  {projeto.etapas.map((etapa) => (
+                    <div key={etapa.nome} className="flex justify-between items-center text-sm">
+                      <span className="text-muted-foreground">{etapa.label || labelsEtapas[etapa.nome] || etapa.nome}</span>
+                      {etapa.responsavel ? (
+                        <div className="flex items-center gap-1.5">
+                          <span className="w-5 h-5 rounded-full bg-brand-600/20 flex items-center justify-center text-[10px] font-bold text-brand-600">
+                            {etapa.responsavel.nome.charAt(0).toUpperCase()}
+                          </span>
+                          <span className="font-medium text-foreground">{etapa.responsavel.nome}</span>
+                        </div>
+                      ) : (
+                        <span className="text-muted-foreground italic text-xs">Não atribuído</span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Valores */}
-            <div className="p-5 rounded-lg border border-border bg-card space-y-4 lg:col-span-2">
+            <div className={cn(
+              'p-5 rounded-lg border border-border bg-card space-y-4',
+              projeto.etapas?.some((e) => e.responsavel) ? '' : 'lg:col-span-2'
+            )}>
               <h3 className="text-sm font-semibold text-foreground uppercase tracking-wider flex items-center gap-2">
                 <span className="text-brand-500">R$</span>
                 Valores
@@ -317,7 +389,7 @@ export function ProjetoDetailPage() {
                   </div>
                   {/* Checkboxes de etapas concluídas */}
                   <div className="flex flex-wrap gap-2">
-                    {etapasTipo.map((etapa) => {
+                    {etapasDoProjeto.map((etapa) => {
                       const concluida = ambiente.etapasConcluidas?.[etapa] === true;
                       return (
                         <div
@@ -334,7 +406,7 @@ export function ProjetoDetailPage() {
                           ) : (
                             <Circle className="h-3 w-3" />
                           )}
-                          {ETAPAS_LABELS[etapa] || etapa}
+                          {labelsEtapas[etapa] || etapa}
                         </div>
                       );
                     })}
@@ -365,10 +437,10 @@ export function ProjetoDetailPage() {
                     <div className="p-3 rounded-lg border border-border bg-card">
                       <div className="flex items-center justify-between mb-1">
                         <span className="text-sm font-medium text-foreground">
-                          {ETAPAS_LABELS[item.etapaDe]} → {ETAPAS_LABELS[item.etapaPara]}
+                          {labelsEtapas[item.etapaDe] || item.etapaDe} → {labelsEtapas[item.etapaPara] || item.etapaPara}
                         </span>
                         <span className="text-xs text-muted-foreground">
-                          {item.data?.toDate?.()?.toLocaleDateString('pt-BR') || '—'}
+                          {tsToDate(item.data).toLocaleDateString('pt-BR')}
                         </span>
                       </div>
                       <p className="text-xs text-muted-foreground">{item.usuarioNome}</p>
@@ -383,6 +455,9 @@ export function ProjetoDetailPage() {
           </div>
         )}
       </div>
+
+      {/* Edit Modal */}
+      <ProjetoFormModal open={editModalOpen} onClose={() => setEditModalOpen(false)} projeto={projeto} />
     </div>
   );
 }

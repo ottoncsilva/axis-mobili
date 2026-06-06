@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useCliente, useClientesMutation } from '../hooks/useClientes';
 import { ClienteFormModal } from './ClienteFormModal';
 import { ConfirmDialog } from '@/components/common/ConfirmDialog';
@@ -9,11 +9,14 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { formatCNPJ, formatTelefone, formatMoeda } from '@/lib/masks';
 import { formatDate } from '@/lib/utils';
 import { cn } from '@/lib/utils';
-import type { TipoPrecificacao } from '@/types/global.types';
+import type { TipoPrecificacao, TipoServico } from '@/types/global.types';
+import { useProjetos } from '@/features/kanban/hooks/useKanban';
+import { useFaturas } from '@/features/faturamento/hooks/useFaturas';
 import {
   ArrowLeft, Pencil, ToggleLeft, ToggleRight,
   Building2, MapPin, MessageSquare, Phone, Mail,
   FolderKanban, Receipt, TrendingUp, ExternalLink,
+  ChevronRight,
 } from 'lucide-react';
 
 const TIPO_LABELS: Record<TipoPrecificacao, string> = {
@@ -22,6 +25,198 @@ const TIPO_LABELS: Record<TipoPrecificacao, string> = {
   valor_combinado: 'Valor Combinado',
   valor_fixo_ambiente: 'Valor Fixo por Ambiente',
 };
+
+const TIPO_SERVICO_LABELS: Record<TipoServico, string> = {
+  projeto_venda: 'Projeto Venda',
+  projeto_executivo: 'Projeto Executivo',
+  medicao: 'Medição',
+};
+
+const TIPO_SERVICO_COLORS: Record<TipoServico, string> = {
+  projeto_venda: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
+  projeto_executivo: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
+  medicao: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
+};
+
+const STATUS_FATURA_LABELS: Record<string, string> = {
+  rascunho: 'Rascunho',
+  emitida: 'Emitida',
+  paga: 'Paga',
+  cancelada: 'Cancelada',
+  vencida: 'Vencida',
+};
+
+const STATUS_FATURA_COLORS: Record<string, string> = {
+  rascunho: 'bg-muted text-muted-foreground',
+  emitida: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
+  paga: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+  cancelada: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
+  vencida: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400',
+};
+
+const STATUS_FATURAMENTO_LABELS: Record<string, string> = {
+  em_andamento: 'Em Andamento',
+  pronto_para_faturar: 'Pronto p/ Faturar',
+  faturado: 'Faturado',
+};
+
+function tsToDate(ts: any): Date {
+  if (!ts) return new Date();
+  if (ts instanceof Date) return ts;
+  if (typeof ts.toDate === 'function') return ts.toDate();
+  if (ts._seconds !== undefined) return new Date(ts._seconds * 1000);
+  return new Date(ts);
+}
+
+// Sub-component that uses hooks for projetos + faturas data (hooks must be called unconditionally)
+function ClienteTabsContent({
+  clienteId,
+  activeTab,
+}: {
+  clienteId: string;
+  activeTab: string;
+}) {
+  const { data: projetosVenda } = useProjetos('projeto_venda');
+  const { data: projetosExecutivo } = useProjetos('projeto_executivo');
+  const { data: projetosMedicao } = useProjetos('medicao');
+  const { data: faturas } = useFaturas({ clienteId });
+
+  const todosProjetos = [
+    ...(projetosVenda ?? []),
+    ...(projetosExecutivo ?? []),
+    ...(projetosMedicao ?? []),
+  ].filter((p) => p.clienteId === clienteId);
+
+  const faturasCliente = faturas ?? [];
+  const faturasAtivas = faturasCliente.filter((f) => f.status !== 'cancelada');
+
+  const totalFaturado = faturasAtivas.reduce((sum, f) => sum + (f.valorTotal ?? 0), 0);
+  const totalPago = faturasCliente
+    .filter((f) => f.status === 'paga')
+    .reduce((sum, f) => sum + (f.valorTotal ?? 0), 0);
+  const totalPendente = faturasCliente
+    .filter((f) => f.status === 'emitida')
+    .reduce((sum, f) => sum + (f.valorTotal ?? 0), 0);
+  const totalVencido = faturasCliente
+    .filter((f) => f.status === 'vencida')
+    .reduce((sum, f) => sum + (f.valorTotal ?? 0), 0);
+
+  const projetosAtivos = todosProjetos.filter((p) => p.etapaAtual !== 'concluido').length;
+  const projetosConcluidos = todosProjetos.filter((p) => p.etapaAtual === 'concluido').length;
+
+  if (activeTab === 'projetos') {
+    if (todosProjetos.length === 0) {
+      return <EmptyState icon={FolderKanban} title="Nenhum projeto cadastrado" description="Os projetos desta loja aparecerão aqui." />;
+    }
+    return (
+      <div className="space-y-2">
+        {todosProjetos.map((projeto) => (
+          <Link
+            key={projeto.id}
+            to={`/projetos/${projeto.id}`}
+            className="flex items-center justify-between p-4 rounded-lg border border-border bg-card hover:bg-accent transition-all group"
+          >
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="min-w-0">
+                <p className="text-sm font-medium text-foreground truncate">{projeto.clienteFinal.nome}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  {projeto.etapaAtual}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 shrink-0 ml-3">
+              <span className={cn('text-xs font-medium px-2 py-0.5 rounded-full', TIPO_SERVICO_COLORS[projeto.tipoServico])}>
+                {TIPO_SERVICO_LABELS[projeto.tipoServico]}
+              </span>
+              <span className="text-xs text-muted-foreground hidden sm:inline">
+                {STATUS_FATURAMENTO_LABELS[projeto.statusFaturamento]}
+              </span>
+              {projeto.valorCalculado != null && (
+                <span className="text-sm font-medium text-foreground font-mono hidden md:inline">
+                  {formatMoeda(projeto.valorCalculado)}
+                </span>
+              )}
+              <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-foreground transition-all" />
+            </div>
+          </Link>
+        ))}
+      </div>
+    );
+  }
+
+  if (activeTab === 'faturas') {
+    if (faturasCliente.length === 0) {
+      return <EmptyState icon={Receipt} title="Nenhuma fatura gerada" description="As faturas desta loja aparecerão aqui." />;
+    }
+    return (
+      <div className="space-y-2">
+        {faturasCliente.map((fatura) => (
+          <Link
+            key={fatura.id}
+            to={`/faturamento/${fatura.id}`}
+            className="flex items-center justify-between p-4 rounded-lg border border-border bg-card hover:bg-accent transition-all group"
+          >
+            <div className="flex items-center gap-3">
+              <span className="text-sm font-mono text-foreground">{fatura.numero}</span>
+              <span className={cn('text-xs font-medium px-2 py-0.5 rounded-full', STATUS_FATURA_COLORS[fatura.status])}>
+                {STATUS_FATURA_LABELS[fatura.status]}
+              </span>
+            </div>
+            <div className="flex items-center gap-3 shrink-0">
+              {fatura.dataVencimento && (
+                <span className="text-xs text-muted-foreground hidden sm:inline">
+                  Venc. {tsToDate(fatura.dataVencimento).toLocaleDateString('pt-BR')}
+                </span>
+              )}
+              <span className="text-sm font-semibold text-foreground font-mono">
+                {formatMoeda(fatura.valorTotal)}
+              </span>
+              <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-foreground transition-all" />
+            </div>
+          </Link>
+        ))}
+      </div>
+    );
+  }
+
+  if (activeTab === 'financeiro') {
+    return (
+      <div className="space-y-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {[
+            { label: 'Total Faturado', valor: formatMoeda(totalFaturado), color: 'text-foreground' },
+            { label: 'Total Pago', valor: formatMoeda(totalPago), color: 'text-brand-600 dark:text-brand-400' },
+            { label: 'Total Pendente', valor: formatMoeda(totalPendente), color: 'text-yellow-500' },
+            { label: 'Total Vencido', valor: formatMoeda(totalVencido), color: 'text-red-500' },
+          ].map((item) => (
+            <div key={item.label} className="p-4 rounded-lg border border-border bg-card text-center">
+              <p className="text-xs text-muted-foreground mb-1">{item.label}</p>
+              <p className={cn('text-lg font-bold', item.color)}>{item.valor}</p>
+            </div>
+          ))}
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="p-4 rounded-lg border border-border bg-card flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <FolderKanban className="h-4 w-4 text-brand-500" />
+              <span className="text-sm text-muted-foreground">Projetos Ativos</span>
+            </div>
+            <span className="text-lg font-bold text-foreground">{projetosAtivos}</span>
+          </div>
+          <div className="p-4 rounded-lg border border-border bg-card flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <TrendingUp className="h-4 w-4 text-green-500" />
+              <span className="text-sm text-muted-foreground">Projetos Concluídos</span>
+            </div>
+            <span className="text-lg font-bold text-foreground">{projetosConcluidos}</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return null;
+}
 
 export function ClienteDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -221,28 +416,8 @@ export function ClienteDetailPage() {
           </div>
         )}
 
-        {activeTab === 'projetos' && (
-          <EmptyState icon={FolderKanban} title="Nenhum projeto cadastrado" description="Os projetos desta loja aparecerão aqui." />
-        )}
-
-        {activeTab === 'faturas' && (
-          <EmptyState icon={Receipt} title="Nenhuma fatura gerada" description="As faturas desta loja aparecerão aqui." />
-        )}
-
-        {activeTab === 'financeiro' && (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {[
-              { label: 'Total Faturado', valor: 'R$ 0,00', color: 'text-foreground' },
-              { label: 'Total Pago', valor: 'R$ 0,00', color: 'text-brand-600 dark:text-brand-400' },
-              { label: 'Total Pendente', valor: 'R$ 0,00', color: 'text-yellow-500' },
-              { label: 'Total Vencido', valor: 'R$ 0,00', color: 'text-red-500' },
-            ].map((item) => (
-              <div key={item.label} className="p-4 rounded-lg border border-border bg-card text-center">
-                <p className="text-xs text-muted-foreground mb-1">{item.label}</p>
-                <p className={cn('text-lg font-bold', item.color)}>{item.valor}</p>
-              </div>
-            ))}
-          </div>
+        {(activeTab === 'projetos' || activeTab === 'faturas' || activeTab === 'financeiro') && (
+          <ClienteTabsContent clienteId={cliente.id} activeTab={activeTab} />
         )}
       </div>
 
