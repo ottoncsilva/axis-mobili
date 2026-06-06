@@ -1,7 +1,8 @@
-import { Eye, MoreVertical, FileText } from 'lucide-react';
+import { Eye, FileText } from 'lucide-react';
 import type { Fatura } from '@/types/global.types';
 import { formatMoeda } from '@/lib/masks';
 import { cn } from '@/lib/utils';
+import { useNavigate } from 'react-router-dom';
 
 interface Props {
   faturas: Fatura[];
@@ -17,6 +18,7 @@ const STATUS_LABELS: Record<string, { label: string; color: string }> = {
 };
 
 export function FaturasListTable({ faturas, isLoading }: Props) {
+  const navigate = useNavigate();
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-8 text-muted-foreground">
@@ -75,11 +77,12 @@ export function FaturasListTable({ faturas, isLoading }: Props) {
                 <td className="px-6 py-4 text-sm text-muted-foreground">{vencimento}</td>
                 <td className="px-6 py-4 text-right">
                   <div className="flex items-center justify-end gap-2">
-                    <button className="p-2 rounded-lg hover:bg-muted transition-colors text-brand-600 hover:text-brand-700">
+                    <button
+                      onClick={() => navigate(`/faturamento/${fatura.id}`)}
+                      className="p-2 rounded-lg hover:bg-muted transition-colors text-brand-600 hover:text-brand-700"
+                      title="Ver detalhes"
+                    >
                       <Eye className="h-4 w-4" />
-                    </button>
-                    <button className="p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground">
-                      <MoreVertical className="h-4 w-4" />
                     </button>
                   </div>
                 </td>

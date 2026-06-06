@@ -1,8 +1,9 @@
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTheme } from '@/app/ThemeProvider';
-import { Bell, LogOut, User, Menu, Sun, Moon } from 'lucide-react';
+import { LogOut, User, Menu, Sun, Moon } from 'lucide-react';
 import { useState } from 'react';
+import { NotificationDropdown } from '@/features/notificacoes/components/NotificationDropdown';
 
 const PAGE_TITLES: Record<string, string> = {
   '/dashboard': 'Dashboard',
@@ -37,6 +38,16 @@ export function Header({ onMenuClick }: HeaderProps) {
       ? 'Detalhes do Projeto'
       : currentPath.startsWith('/faturamento/')
       ? 'Detalhes da Fatura'
+      : currentPath.startsWith('/configuracoes/empresa')
+      ? 'Configurações — Empresa'
+      : currentPath.startsWith('/configuracoes/etapas')
+      ? 'Configurações — Etapas'
+      : currentPath.startsWith('/configuracoes/permissoes')
+      ? 'Configurações — Permissões'
+      : currentPath.startsWith('/configuracoes/feriados')
+      ? 'Configurações — Feriados'
+      : currentPath.startsWith('/configuracoes/notificacoes')
+      ? 'Configurações — Notificações'
       : 'Axis Mobili');
 
   const handleLogout = async () => {
@@ -74,13 +85,7 @@ export function Header({ onMenuClick }: HeaderProps) {
         </button>
 
         {/* Notification Bell */}
-        <button
-          className="relative p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-all"
-          title="Notificações"
-          aria-label="Notificações"
-        >
-          <Bell className="h-5 w-5" />
-        </button>
+        <NotificationDropdown />
 
         {/* User Menu */}
         <div className="relative">
@@ -107,7 +112,10 @@ export function Header({ onMenuClick }: HeaderProps) {
                   <p className="text-sm font-semibold text-foreground">{user?.nome}</p>
                   <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
                 </div>
-                <button className="flex items-center gap-2 w-full px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-all">
+                <button
+                  onClick={() => { setShowUserMenu(false); navigate('/alterar-senha'); }}
+                  className="flex items-center gap-2 w-full px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-all"
+                >
                   <User className="h-4 w-4 flex-shrink-0" />
                   Meu Perfil
                 </button>

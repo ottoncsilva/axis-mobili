@@ -33,6 +33,7 @@ import { ColaboradoresListPage } from '@/features/colaboradores/components/Colab
 
 // Faturamento
 import { FaturamentosPage } from '@/features/faturamento/pages/FaturamentosPage';
+import { FaturaDetailPage } from '@/features/faturamento/pages/FaturaDetailPage';
 
 // Relatórios
 import { RelatoriosPage } from '@/features/relatorios/pages/RelatoriosPage';
@@ -150,6 +151,14 @@ export function Router() {
             element={
               <ProtectedRoute modulo="faturamento">
                 <FaturamentosPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/faturamento/:id"
+            element={
+              <ProtectedRoute modulo="faturamento">
+                <FaturaDetailPage />
               </ProtectedRoute>
             }
           />
