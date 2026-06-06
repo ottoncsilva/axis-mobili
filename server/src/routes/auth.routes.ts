@@ -7,7 +7,7 @@ export async function authRoutes(app: FastifyInstance) {
     '/login',
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
-        const { email, senha } = request.body;
+        const { email, senha } = request.body as { email: string; senha: string };
 
         if (!email || !senha) {
           return reply.status(400).send({
@@ -31,7 +31,7 @@ export async function authRoutes(app: FastifyInstance) {
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
         const userId = (request as any).userId;
-        const { senhaAtual, novaSenha } = request.body;
+        const { senhaAtual, novaSenha } = request.body as { senhaAtual: string; novaSenha: string };
 
         if (!senhaAtual || !novaSenha) {
           return reply.status(400).send({
@@ -68,7 +68,7 @@ export async function authRoutes(app: FastifyInstance) {
           });
         }
 
-        const { usuarioId } = request.params;
+        const { usuarioId } = request.params as { usuarioId: string };
         const result = await authService.resetarSenha(usuarioId);
         return reply.send(result);
       } catch (error: any) {

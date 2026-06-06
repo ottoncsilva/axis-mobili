@@ -1,6 +1,6 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { db } from '../config/firebase.js';
+import { adminDb } from '../config/firebase-admin.js';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'axis-mobili-secret-key';
 const TOKEN_EXPIRY = '7d';
@@ -13,7 +13,7 @@ export interface TokenPayload {
 
 export class AuthService {
   async login(email: string, senha: string) {
-    const usuariosRef = db.collection('usuarios');
+    const usuariosRef = adminDb.collection('usuarios');
     const snapshot = await usuariosRef.where('email', '==', email).get();
 
     if (snapshot.empty) {
@@ -55,7 +55,7 @@ export class AuthService {
   }
 
   async alterarSenha(userId: string, senhaAtual: string, novaSenha: string) {
-    const usuarioDoc = await db.collection('usuarios').doc(userId).get();
+    const usuarioDoc = await adminDb.collection('usuarios').doc(userId).get();
 
     if (!usuarioDoc.exists) {
       throw new Error('Usuário não encontrado');
@@ -70,7 +70,7 @@ export class AuthService {
 
     const novoHash = await bcrypt.hash(novaSenha, 10);
 
-    await db.collection('usuarios').doc(userId).update({
+    await adminDb.collection('usuarios').doc(userId).update({
       senhaHash: novoHash,
       atualizadoEm: new Date(),
     });
@@ -82,7 +82,7 @@ export class AuthService {
     const senhaAberta = 'usuario123';
     const novoHash = await bcrypt.hash(senhaAberta, 10);
 
-    await db.collection('usuarios').doc(userId).update({
+    await adminDb.collection('usuarios').doc(userId).update({
       senhaHash: novoHash,
       atualizadoEm: new Date(),
     });
@@ -108,7 +108,7 @@ export class AuthService {
       return;
     }
 
-    const usuariosRef = db.collection('usuarios');
+    const usuariosRef = adminDb.collection('usuarios');
     const snapshot = await usuariosRef.where('email', '==', adminEmail).get();
 
     if (!snapshot.empty) {

@@ -18,14 +18,14 @@ async function start() {
     await configuracoesService.inicializar();
     console.log('✅ Configurações inicializadas');
   } catch (err) {
-    fastify.log.error('Erro ao inicializar configurações:', err);
+    fastify.log.error({ err }, 'Erro ao inicializar configurações');
   }
 
   // Create default admin user
   try {
     await authService.criarAdminPadrao();
   } catch (err) {
-    fastify.log.error('Erro ao criar admin padrão:', err);
+    fastify.log.error({ err }, 'Erro ao criar admin padrão');
   }
 
   // CORS

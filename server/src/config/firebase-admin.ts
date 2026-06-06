@@ -31,6 +31,6 @@ const app = initializeFirebaseAdmin();
 
 export const adminAuth = admin.auth();
 export const adminDb = admin.firestore();
-export const adminStorage = admin.storage();
+export const adminStorage: admin.storage.Storage = admin.storage();
 
 export default app;

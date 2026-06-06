@@ -1,6 +1,6 @@
 import type { FastifyRequest, FastifyReply } from 'fastify';
 import authService from '../services/auth.service.js';
-import { db } from '../config/firebase.js';
+import { adminDb } from '../config/firebase-admin.js';
 
 export interface AuthenticatedRequest extends FastifyRequest {
   userId?: string;
@@ -27,7 +27,7 @@ export async function authMiddleware(
     const decoded = authService.verifyToken(token);
 
     // Verify user still exists and is active
-    const userDoc = await db.collection('usuarios').doc(decoded.userId).get();
+    const userDoc = await adminDb.collection('usuarios').doc(decoded.userId).get();
     if (!userDoc.exists) {
       return reply.status(401).send({
         error: 'Não autorizado',
