@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useAuth } from '@/features/auth/hooks/useAuth';
-import type { Configuracoes, PermissoesPerfil } from '@/types/global.types';
+import type { PermissoesPerfil } from '@/types/global.types';
 
 export function usePermissions() {
   const { usuario } = useAuth();
@@ -18,11 +18,10 @@ export function usePermissions() {
 
     const fetchPermissoes = async () => {
       try {
-        const configDoc = await getDoc(doc(db, 'configuracoes', 'geral'));
+        const configDoc = await getDoc(doc(db, 'configuracoes', 'default', 'permissoes', 'config'));
         if (configDoc.exists()) {
-          const config = configDoc.data() as Configuracoes;
-          const perfilPermissoes = config.permissoes?.[usuario.perfil];
-          setPermissoes(perfilPermissoes || null);
+          const data = configDoc.data() as Record<string, PermissoesPerfil>;
+          setPermissoes(data[usuario.perfil] || null);
         }
       } catch (err) {
         console.error('Erro ao buscar permissões:', err);

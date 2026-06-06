@@ -43,6 +43,27 @@ async function start() {
     environment: process.env.NODE_ENV || 'development',
   }));
 
+  // Diagnostics: confirm admin user exists (never exposes password hash)
+  fastify.get('/api/debug/admin', async (request, reply) => {
+    try {
+      const email = process.env.ADMIN_EMAIL;
+      if (!email) return reply.send({ configured: false });
+      const snap = await adminDb.collection('usuarios').where('email', '==', email).get();
+      if (snap.empty) return reply.send({ configured: true, exists: false, email });
+      const data = snap.docs[0].data();
+      return reply.send({
+        configured: true,
+        exists: true,
+        email: data.email,
+        ativo: data.ativo,
+        perfil: data.perfil,
+        hasHash: !!data.senhaHash,
+      });
+    } catch (err: any) {
+      return reply.status(500).send({ error: err.message });
+    }
+  });
+
   // API routes
   const { authRoutes } = await import('./routes/auth.routes.js');
   await fastify.register(authRoutes, { prefix: '/api/auth' });

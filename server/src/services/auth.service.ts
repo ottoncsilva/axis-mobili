@@ -108,16 +108,17 @@ export class AuthService {
       return;
     }
 
+    const senhaHash = await bcrypt.hash(adminSenha, 10);
+    const agora = new Date();
     const usuariosRef = adminDb.collection('usuarios');
     const snapshot = await usuariosRef.where('email', '==', adminEmail).get();
 
     if (!snapshot.empty) {
-      console.log('✅ Admin já existe');
+      // Always sync password from env var so changes take effect on redeploy
+      await snapshot.docs[0].ref.update({ senhaHash, atualizadoEm: agora });
+      console.log(`✅ Admin sincronizado: ${adminEmail}`);
       return;
     }
-
-    const senhaHash = await bcrypt.hash(adminSenha, 10);
-    const agora = new Date();
 
     await usuariosRef.add({
       email: adminEmail,
