@@ -34,10 +34,12 @@ export function usePermissions() {
   }, [usuario]);
 
   const canAccess = (modulo: string, acao: string = 'visualizar'): boolean => {
-    if (!usuario || !permissoes) return false;
+    if (!usuario) return false;
 
-    // Admin has access to everything
+    // Admin has access to everything — check before permissoes guard
     if (usuario.perfil === 'admin') return true;
+
+    if (!permissoes) return false;
 
     const moduloPermissoes = permissoes[modulo as keyof PermissoesPerfil];
 
