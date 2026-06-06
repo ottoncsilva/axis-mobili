@@ -31,6 +31,9 @@ import { ConfigFeriadosPage } from '@/features/configuracoes/pages/ConfigFeriado
 // Colaboradores
 import { ColaboradoresListPage } from '@/features/colaboradores/components/ColaboradoresListPage';
 
+// Faturamento
+import { FaturamentosPage } from '@/features/faturamento/pages/FaturamentosPage';
+
 // Placeholder pages for modules not yet implemented
 function PlaceholderPage({ title }: { title: string }) {
   return (
@@ -143,15 +146,7 @@ export function Router() {
             path="/faturamento"
             element={
               <ProtectedRoute modulo="faturamento">
-                <PlaceholderPage title="Faturamento" />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/faturamento/:id"
-            element={
-              <ProtectedRoute modulo="faturamento">
-                <PlaceholderPage title="Detalhes da Fatura" />
+                <FaturamentosPage />
               </ProtectedRoute>
             }
           />
