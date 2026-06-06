@@ -168,13 +168,41 @@ export const projetosService = {
       atualizadoEm: FieldValue.serverTimestamp(),
     };
 
+    // Stage movement — core Kanban operation
+    if (data.etapas !== undefined) updateData.etapas = data.etapas;
+    if (data.etapaAtual !== undefined) {
+      updateData.etapaAtual = data.etapaAtual;
+
+      // Append history entry when stage changes
+      if (data.etapaAnterior && data.etapaAnterior !== data.etapaAtual) {
+        const historicoItem = {
+          id: `hist_${Date.now()}`,
+          data: FieldValue.serverTimestamp(),
+          etapaDe: data.etapaAnterior,
+          etapaPara: data.etapaAtual,
+          usuarioId: data.usuarioId || 'sistema',
+          usuarioNome: data.usuarioNome || 'Sistema',
+          observacao: data.observacaoMovimento || null,
+        };
+        updateData.historico = FieldValue.arrayUnion(historicoItem);
+      }
+
+      // Auto-set billing status when reaching 'concluido'
+      if (data.etapaAtual === 'concluido') {
+        updateData.statusFaturamento = 'pronto_para_faturar';
+        updateData.concluidoEm = FieldValue.serverTimestamp();
+      }
+    }
+    if (data.statusFaturamento !== undefined) updateData.statusFaturamento = data.statusFaturamento;
+
+    // Project data fields
     if (data.clienteFinal !== undefined) updateData.clienteFinal = data.clienteFinal;
     if (data.ambientes !== undefined) {
       updateData.ambientes = data.ambientes.map((a: any, index: number) => ({
-        id: `amb_${Date.now()}_${index}`,
+        id: a.id || `amb_${Date.now()}_${index}`,
         nome: a.nome,
         observacoes: a.observacoes || null,
-        etapasConcluidas: {},
+        etapasConcluidas: a.etapasConcluidas || {},
       }));
     }
     if (data.valorVenda !== undefined) updateData.valorVenda = data.valorVenda || null;

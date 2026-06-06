@@ -4,6 +4,7 @@ import { useEtapas } from '@/hooks/useConfiguracoes';
 import { useProjetos, useMoveProject, useAtribuirResponsavel, useSLAAlertas } from '../hooks/useKanban';
 import { KanbanBoard } from '../components/KanbanBoard';
 import { AtribuirResponsavelModal } from '../components/AtribuirResponsavelModal';
+import { ProjetoFormModal } from '@/features/projetos/components/ProjetoFormModal';
 import { Button } from '@/components/ui/button';
 import { Plus, RefreshCw } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
@@ -13,6 +14,7 @@ export function KanbanMedicaoPage() {
   const [projetoSelecionado, setProjetoSelecionado] = useState<Projeto | null>(null);
   const [etapaSelecionada, setEtapaSelecionada] = useState<any>(null);
   const [modalAberto, setModalAberto] = useState(false);
+  const [novoProjetoAberto, setNovoProjetoAberto] = useState(false);
 
   const { data: etapasConfig, isLoading: etapasLoading } = useEtapas();
   const { data: projetos, isLoading: projetosLoading, refetch: refetchProjetos } = useProjetos('medicao');
@@ -68,7 +70,7 @@ export function KanbanMedicaoPage() {
             <RefreshCw className="w-4 h-4 mr-2" />
             Atualizar
           </Button>
-          <Button size="sm">
+          <Button size="sm" onClick={() => setNovoProjetoAberto(true)}>
             <Plus className="w-4 h-4 mr-2" />
             Novo Projeto
           </Button>
@@ -120,6 +122,12 @@ export function KanbanMedicaoPage() {
         usuarios={usuarios}
         onAtribuir={handleAtribuir}
         isLoading={atribuirResponsavel.isPending}
+      />
+
+      <ProjetoFormModal
+        open={novoProjetoAberto}
+        onClose={() => setNovoProjetoAberto(false)}
+        defaultTipoServico="medicao"
       />
     </div>
   );

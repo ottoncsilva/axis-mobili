@@ -15,6 +15,7 @@ interface Props {
   open: boolean;
   onClose: () => void;
   projeto?: Projeto;
+  defaultTipoServico?: string;
 }
 
 const TIPO_SERVICO_LABELS: Record<string, string> = {
@@ -46,7 +47,7 @@ const defaultFormData: ProjetoFormData = {
   observacoes: '',
 };
 
-export function ProjetoFormModal({ open, onClose, projeto }: Props) {
+export function ProjetoFormModal({ open, onClose, projeto, defaultTipoServico }: Props) {
   const [activeTab, setActiveTab] = useState('dados');
   const [buscandoCEP, setBuscandoCEP] = useState(false);
   const [erroCEP, setErroCEP] = useState('');
@@ -115,7 +116,10 @@ export function ProjetoFormModal({ open, onClose, projeto }: Props) {
         });
         setShowEndereco(!!projeto.clienteFinal.endereco);
       } else {
-        reset(defaultFormData);
+        reset({
+          ...defaultFormData,
+          tipoServico: (defaultTipoServico as any) || defaultFormData.tipoServico,
+        });
         setShowEndereco(false);
       }
       setActiveTab('dados');
