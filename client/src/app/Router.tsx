@@ -21,9 +21,12 @@ import { KanbanMedicaoPage } from '@/features/kanban/pages/KanbanMedicaoPage';
 import { DashboardPage } from '@/features/dashboard/pages/DashboardPage';
 
 // Configurações
+import { ConfiguracoesLayout } from '@/features/configuracoes/components/ConfiguracoesLayout';
+import { ConfigEmpresaPage } from '@/features/configuracoes/pages/ConfigEmpresaPage';
 import { ConfigEtapasPage } from '@/features/configuracoes/pages/ConfigEtapasPage';
 import { ConfigPermissoesPage } from '@/features/configuracoes/pages/ConfigPermissoesPage';
 import { ConfigNotificacoesPage } from '@/features/configuracoes/pages/ConfigNotificacoesPage';
+import { ConfigFeriadosPage } from '@/features/configuracoes/pages/ConfigFeriadosPage';
 
 // Colaboradores
 import { ColaboradoresListPage } from '@/features/colaboradores/components/ColaboradoresListPage';
@@ -171,10 +174,12 @@ export function Router() {
             }
           />
 
-          <Route path="/configuracoes" element={<ProtectedRoute modulo="configuracoes"><Outlet /></ProtectedRoute>}>
-            <Route index element={<Navigate to="/configuracoes/etapas" replace />} />
+          <Route path="/configuracoes" element={<ProtectedRoute modulo="configuracoes"><ConfiguracoesLayout /></ProtectedRoute>}>
+            <Route index element={<Navigate to="/configuracoes/empresa" replace />} />
+            <Route path="empresa" element={<ConfigEmpresaPage />} />
             <Route path="etapas" element={<ConfigEtapasPage />} />
             <Route path="permissoes" element={<ConfigPermissoesPage />} />
+            <Route path="feriados" element={<ConfigFeriadosPage />} />
             <Route path="notificacoes" element={<ConfigNotificacoesPage />} />
           </Route>
 

@@ -71,4 +71,42 @@ export async function configuracoesRoutes(fastify: FastifyInstance) {
       return reply.send({ success: true });
     },
   });
+
+  // GET /api/configuracoes/empresa — Get company info
+  fastify.get('/configuracoes/empresa', {
+    preHandler: permissionMiddleware({ modulo: 'configuracoes', acao: 'visualizar' }),
+    handler: async (request, reply) => {
+      const empresa = await configuracoesService.getEmpresa();
+      return reply.send(empresa);
+    },
+  });
+
+  // PUT /api/configuracoes/empresa — Update company info
+  fastify.put('/configuracoes/empresa', {
+    preHandler: permissionMiddleware({ modulo: 'configuracoes', acao: 'editar' }),
+    handler: async (request, reply) => {
+      const data = request.body as any;
+      await configuracoesService.updateEmpresa(data);
+      return reply.send({ success: true });
+    },
+  });
+
+  // GET /api/configuracoes/feriados — Get holidays
+  fastify.get('/configuracoes/feriados', {
+    preHandler: permissionMiddleware({ modulo: 'configuracoes', acao: 'visualizar' }),
+    handler: async (request, reply) => {
+      const feriados = await configuracoesService.getFeriados();
+      return reply.send(feriados);
+    },
+  });
+
+  // PUT /api/configuracoes/feriados — Update holidays
+  fastify.put('/configuracoes/feriados', {
+    preHandler: permissionMiddleware({ modulo: 'configuracoes', acao: 'editar' }),
+    handler: async (request, reply) => {
+      const data = request.body as any;
+      await configuracoesService.updateFeriados(data);
+      return reply.send({ success: true });
+    },
+  });
 }

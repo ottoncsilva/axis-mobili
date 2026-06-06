@@ -2,7 +2,55 @@ import { adminDb } from '../config/firebase-admin.js';
 import { FieldValue } from 'firebase-admin/firestore';
 import type { ConfigEtapas, PermissoesPerfil, ConfigNotificacoes, PerfilUsuario } from '../types/index.js';
 
-const EMPRESA_ID = 'default'; // Para começar com empresa única
+const EMPRESA_ID = 'default';
+
+interface ConfigEmpresa {
+  nome: string;
+  cnpj?: string;
+  endereco?: string;
+  telefone?: string;
+  email?: string;
+  logoUrl?: string;
+}
+
+interface Feriado {
+  id: string;
+  nome: string;
+  data: string;
+  recorrente: boolean;
+  ano?: number;
+  ativo: boolean;
+}
+
+interface ConfigFeriados {
+  sabadoDiaUtil: boolean;
+  feriadosPadrao: Feriado[];
+  feriadosCustom: Feriado[];
+}
+
+const EMPRESA_PADRAO: ConfigEmpresa = {
+  nome: 'Axis Mobili',
+  cnpj: '',
+  endereco: '',
+  telefone: '',
+  email: '',
+  logoUrl: '',
+};
+
+const FERIADOS_PADRAO: ConfigFeriados = {
+  sabadoDiaUtil: false,
+  feriadosPadrao: [
+    { id: 'confraternizacao', nome: 'Confraternização Universal', data: '01/01', recorrente: true, ativo: true },
+    { id: 'tiradentes', nome: 'Tiradentes', data: '21/04', recorrente: true, ativo: true },
+    { id: 'trabalho', nome: 'Dia do Trabalho', data: '01/05', recorrente: true, ativo: true },
+    { id: 'independencia', nome: 'Independência do Brasil', data: '07/09', recorrente: true, ativo: true },
+    { id: 'aparecida', nome: 'N. Sra. Aparecida', data: '12/10', recorrente: true, ativo: true },
+    { id: 'finados', nome: 'Finados', data: '02/11', recorrente: true, ativo: true },
+    { id: 'republica', nome: 'Proclamação da República', data: '15/11', recorrente: true, ativo: true },
+    { id: 'natal', nome: 'Natal', data: '25/12', recorrente: true, ativo: true },
+  ],
+  feriadosCustom: [],
+};
 
 // Modelos padrão de etapas
 const ETAPAS_PADRAO_VENDA: ConfigEtapas['projetoVenda'] = [
@@ -179,18 +227,62 @@ export const configuracoesService = {
       .set(config, { merge: true });
   },
 
+  async getEmpresa(): Promise<ConfigEmpresa> {
+    const doc = await adminDb
+      .collection('configuracoes')
+      .doc(EMPRESA_ID)
+      .collection('empresa')
+      .doc('config')
+      .get();
+
+    if (!doc.exists) return EMPRESA_PADRAO;
+    return { ...EMPRESA_PADRAO, ...doc.data() } as ConfigEmpresa;
+  },
+
+  async updateEmpresa(config: ConfigEmpresa): Promise<void> {
+    await adminDb
+      .collection('configuracoes')
+      .doc(EMPRESA_ID)
+      .collection('empresa')
+      .doc('config')
+      .set(config, { merge: true });
+  },
+
+  async getFeriados(): Promise<ConfigFeriados> {
+    const doc = await adminDb
+      .collection('configuracoes')
+      .doc(EMPRESA_ID)
+      .collection('feriados')
+      .doc('config')
+      .get();
+
+    if (!doc.exists) return FERIADOS_PADRAO;
+    const data = doc.data() as any;
+    return {
+      sabadoDiaUtil: data.sabadoDiaUtil ?? false,
+      feriadosPadrao: data.feriadosPadrao ?? FERIADOS_PADRAO.feriadosPadrao,
+      feriadosCustom: data.feriadosCustom ?? [],
+    };
+  },
+
+  async updateFeriados(config: ConfigFeriados): Promise<void> {
+    await adminDb
+      .collection('configuracoes')
+      .doc(EMPRESA_ID)
+      .collection('feriados')
+      .doc('config')
+      .set(config);
+  },
+
   async getConfiguracoes() {
-    const [etapas, permissoes, notificacoes] = await Promise.all([
+    const [etapas, permissoes, notificacoes, empresa] = await Promise.all([
       this.getEtapas(),
       this.getPermissoes(),
       this.getNotificacoes(),
+      this.getEmpresa(),
     ]);
 
-    return {
-      etapas,
-      permissoes,
-      notificacoes,
-    };
+    return { etapas, permissoes, notificacoes, empresa };
   },
 
   // Initialize with defaults if not exists

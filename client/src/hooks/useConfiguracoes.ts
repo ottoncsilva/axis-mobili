@@ -5,6 +5,8 @@ import {
   type PermissoesPerfil,
   type ConfigNotificacoes,
   type PerfilUsuario,
+  type ConfigEmpresa,
+  type ConfigFeriados,
 } from '@/features/configuracoes/services/configuracoesService';
 
 // Get all configurations
@@ -73,6 +75,46 @@ export function useUpdateNotificacoes() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['configuracoes'] });
       queryClient.invalidateQueries({ queryKey: ['configuracoes', 'notificacoes'] });
+    },
+  });
+}
+
+// Get company info
+export function useEmpresa() {
+  return useQuery({
+    queryKey: ['configuracoes', 'empresa'],
+    queryFn: () => configuracoesService.getEmpresa(),
+  });
+}
+
+// Update company info
+export function useUpdateEmpresa() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (empresa: ConfigEmpresa) => configuracoesService.updateEmpresa(empresa),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['configuracoes'] });
+      queryClient.invalidateQueries({ queryKey: ['configuracoes', 'empresa'] });
+    },
+  });
+}
+
+// Get holidays
+export function useFeriados() {
+  return useQuery({
+    queryKey: ['configuracoes', 'feriados'],
+    queryFn: () => configuracoesService.getFeriados(),
+  });
+}
+
+// Update holidays
+export function useUpdateFeriados() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (feriados: ConfigFeriados) => configuracoesService.updateFeriados(feriados),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['configuracoes'] });
+      queryClient.invalidateQueries({ queryKey: ['configuracoes', 'feriados'] });
     },
   });
 }
