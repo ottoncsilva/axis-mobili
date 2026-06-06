@@ -23,7 +23,10 @@ export function permissionMiddleware(options: PermissionOptions) {
     if (perfil === 'admin') return;
 
     try {
-      const configDoc = await adminDb.collection('configuracoes').doc('geral').get();
+      const configDoc = await adminDb
+        .collection('configuracoes').doc('default')
+        .collection('permissoes').doc('config')
+        .get();
       if (!configDoc.exists) {
         return reply.status(500).send({
           error: 'Erro interno',
@@ -32,7 +35,7 @@ export function permissionMiddleware(options: PermissionOptions) {
       }
 
       const config = configDoc.data()!;
-      const permissoes = config.permissoes?.[perfil];
+      const permissoes = config[perfil];
 
       if (!permissoes) {
         return reply.status(403).send({

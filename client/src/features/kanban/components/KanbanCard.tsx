@@ -1,6 +1,14 @@
 import { useDraggable } from '@dnd-kit/core';
 import { CSS } from '@dnd-kit/utilities';
 import type { Projeto } from '@/types/global.types';
+
+function tsToDate(ts: any): Date {
+  if (!ts) return new Date();
+  if (ts instanceof Date) return ts;
+  if (typeof ts.toDate === 'function') return ts.toDate();
+  if (ts._seconds !== undefined) return new Date(ts._seconds * 1000);
+  return new Date(ts);
+}
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { AlertTriangle, User } from 'lucide-react';
@@ -90,7 +98,7 @@ export function KanbanCard({ projeto, etapaAtual, onSelect, slaAlerta }: KanbanC
 
         {/* Data criação */}
         <p className="text-xs text-muted-foreground/70">
-          {formatDistanceToNow(projeto.criadoEm.toDate(), { locale: ptBR, addSuffix: true })}
+          {formatDistanceToNow(tsToDate(projeto.criadoEm), { locale: ptBR, addSuffix: true })}
         </p>
       </div>
     </Card>

@@ -1,6 +1,23 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import authService from '../services/auth.service.js';
 import { authMiddleware } from '../middleware/auth.middleware.js';
+import { adminDb } from '../config/firebase-admin.js';
+
+export async function usuariosRoutes(app: FastifyInstance) {
+  app.get('/usuarios', { onRequest: authMiddleware }, async (_request: FastifyRequest, reply: FastifyReply) => {
+    const snapshot = await adminDb.collection('usuarios')
+      .where('ativo', '==', true)
+      .orderBy('nome')
+      .get();
+    const usuarios = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      nome: doc.data().nome,
+      email: doc.data().email,
+      perfil: doc.data().perfil,
+    }));
+    return reply.send(usuarios);
+  });
+}
 
 export async function authRoutes(app: FastifyInstance) {
   app.post<{ Body: { email: string; senha: string } }>(
@@ -90,4 +107,5 @@ export async function authRoutes(app: FastifyInstance) {
       perfil: userPerfil,
     });
   });
+
 }

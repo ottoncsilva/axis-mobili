@@ -7,8 +7,7 @@ import { AtribuirResponsavelModal } from '../components/AtribuirResponsavelModal
 import { Button } from '@/components/ui/button';
 import { Plus, RefreshCw } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
-import { db } from '@/lib/firebase';
-import { collection, getDocs } from 'firebase/firestore';
+import { fetchAPI } from '@/lib/apiClient';
 
 export function KanbanVendaPage() {
   const [projetoSelecionado, setProjetoSelecionado] = useState<Projeto | null>(null);
@@ -20,13 +19,9 @@ export function KanbanVendaPage() {
   const moveProject = useMoveProject('projeto_venda');
   const atribuirResponsavel = useAtribuirResponsavel('projeto_venda');
 
-  // Get all users for assignment
   const { data: usuarios = [] } = useQuery({
     queryKey: ['usuarios'],
-    queryFn: async () => {
-      const snap = await getDocs(collection(db, 'usuarios'));
-      return snap.docs.map((doc) => ({ id: doc.id, ...doc.data() } as any));
-    },
+    queryFn: () => fetchAPI<any[]>('/usuarios'),
   });
 
   const slaAlertas = useSLAAlertas(projetos, 2);

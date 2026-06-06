@@ -66,8 +66,9 @@ async function start() {
   });
 
   // API routes
-  const { authRoutes } = await import('./routes/auth.routes.js');
+  const { authRoutes, usuariosRoutes } = await import('./routes/auth.routes.js');
   await fastify.register(authRoutes, { prefix: '/api/auth' });
+  await fastify.register(usuariosRoutes, { prefix: '/api' });
   const { clientesRoutes } = await import('./routes/clientes.routes.js');
   await fastify.register(clientesRoutes, { prefix: '/api' });
   const { projetosRoutes } = await import('./routes/projetos.routes.js');

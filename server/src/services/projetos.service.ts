@@ -1,5 +1,6 @@
 import { adminDb } from '../config/firebase-admin.js';
 import { FieldValue } from 'firebase-admin/firestore';
+import { configuracoesService } from './configuracoes.service.js';
 
 function getEtapaInicial(tipo: string): string {
   switch (tipo) {
@@ -92,6 +93,27 @@ export const projetosService = {
     const now = FieldValue.serverTimestamp();
     const etapaInicial = getEtapaInicial(data.tipoServico);
 
+    // Build etapas[] from config
+    const configEtapas = await configuracoesService.getEtapas();
+    const tipoMap: Record<string, any[]> = {
+      projeto_venda: configEtapas.projetoVenda,
+      projeto_executivo: configEtapas.projetoExecutivo,
+      medicao: configEtapas.medicao,
+    };
+    const etapasConfig = tipoMap[data.tipoServico] || configEtapas.projetoVenda;
+    const etapas = etapasConfig.map((e: any) => ({
+      id: e.id,
+      nome: e.nome,
+      label: e.label,
+      ordem: e.ordem,
+      sla: e.sla,
+      status: e.nome === etapaInicial ? 'em_progresso' : 'pendente',
+      responsavel: null,
+      dataInicio: e.nome === etapaInicial ? now : null,
+      dataFim: null,
+      diasUtilizados: 0,
+    }));
+
     const valorCalculado = await calcularValor(
       data.clienteId,
       data.tipoServico,
@@ -117,6 +139,7 @@ export const projetosService = {
         observacoes: a.observacoes || null,
         etapasConcluidas: {},
       })),
+      etapas,
       etapaAtual: etapaInicial,
       valorVenda: data.valorVenda || null,
       valorFabrica: data.valorFabrica || null,
