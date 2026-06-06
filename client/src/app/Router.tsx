@@ -34,6 +34,9 @@ import { ColaboradoresListPage } from '@/features/colaboradores/components/Colab
 // Faturamento
 import { FaturamentosPage } from '@/features/faturamento/pages/FaturamentosPage';
 
+// Relatórios
+import { RelatoriosPage } from '@/features/relatorios/pages/RelatoriosPage';
+
 // Placeholder pages for modules not yet implemented
 function PlaceholderPage({ title }: { title: string }) {
   return (
@@ -164,7 +167,7 @@ export function Router() {
             path="/relatorios"
             element={
               <ProtectedRoute modulo="relatorios">
-                <PlaceholderPage title="Relatórios" />
+                <RelatoriosPage />
               </ProtectedRoute>
             }
           />
