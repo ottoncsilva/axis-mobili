@@ -59,7 +59,6 @@ async function start() {
     await fastify.register(staticPlugin.default, {
       root: path.join(__dirname, '../../client/dist'),
       prefix: '/',
-      decorateReply: false,
     });
 
     // SPA fallback: serve index.html for any unmatched route
